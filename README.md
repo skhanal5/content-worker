@@ -1,23 +1,32 @@
-## temporal-tryout
+## clip-farmer-workflow
 
 ### About
-Trying out Temporal and it's Go SDK locally. 
+Implementing the original [clip-farmer project](https://github.com/skhanal5/clip-farmer) as a Temporal Workflow. The goal is to be able to distribute the end to end flow of producing short form content with durable execution. 
 
-### Local Development
+### Development
 
-Install the Temporal CLU using `brew` if you don't have it installed already. 
+#### Running against the Local Temporal Server
 
-To start the local Temporal Service:
-```bash
-temporal server start-dev --ui-port 8080 --db-filename local_instance.db
-```
+1. Install the Temporal CLI using `brew` if you don't have it installed already. 
 
-Run the client to start a Workflow Execution:
-```go
-go run client/main.go
-```
+2. Spin up the Temporal UI and the Temporal Server locally
+    ```bash
+    temporal server start-dev --ui-port 8080
+    ```
+    This will spin up the UI at: http://localhost:8080 and the server at:http://localhost:7233
 
-Run the worker to start a Worker:
-```go
-go run worker/main.go
-``` 
+3. Execute a Workflow
+    ```bash
+    # Example using HelloWorldWorkflow
+    temporal workflow start \
+        --task-queue default \
+        --type HelloWorldWorkflow \
+        --input '{"name":"Bob"}'
+    ```
+
+4. Start the Temporal Worker
+    ```bash
+    make run
+    ```
+
+5. View the results of the workflow on the UI ![alt text](./static/image.png)
