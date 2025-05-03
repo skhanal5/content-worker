@@ -10,6 +10,7 @@ import (
 func main() {
 	temporalClient, err := client.Dial(client.Options{
 		HostPort: client.DefaultHostPort,
+		Namespace: client.DefaultNamespace,
 	})
 	if err != nil {
 		log.Fatalln("Unable to create Temporal client", err)
