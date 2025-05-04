@@ -2,8 +2,7 @@ package workflow
 
 import (
 	"clip-farmer-workflow/internal/activity"
-
-	"github.com/google/uuid"
+	"strings"
 	"go.temporal.io/sdk/workflow"
 )
 
@@ -32,10 +31,11 @@ func PublishClipsWorkflow(ctx workflow.Context, input PublishClipsInput) (error)
 	}
 	
 	var a activity.Activity
-	for _, clipURL := range result.ClipURLs {
+	for _, clip := range result.Clips {
+		mp4Url := getMP4URL(clip.ThumbnailURL)
 		input := DownloadClipInput{
-			ID:  uuid.New().String(), // TODO: use original clip id or title name
-			URL: clipURL,
+			ID:  clip.ID,
+			URL: mp4Url,
 		}
 		output := &DownloadClipOutput{}
 		err := workflow.ExecuteActivity(ctx, a.DownloadClip, input).Get(ctx, &output.OutputPath)
@@ -44,4 +44,18 @@ func PublishClipsWorkflow(ctx workflow.Context, input PublishClipsInput) (error)
 		}
 	}
 	return nil
+}
+
+
+/*
+	Given a thumbnail url, replace the preview portion
+	of it with a ".mp4" extension
+	i.e., https://clips-media-assets2.twitch.tv/jTk1-Xmig5ji1Dll05ivnA/AT-cm%7CjTk1-Xmig5ji1Dll05ivnA-preview-260x147.jpg
+	becomes https://clips-media-assets2.twitch.tv/jTk1-Xmig5ji1Dll05ivnA/AT-cm%7CjTk1-Xmig5ji1Dll05ivnA.mp4
+*/
+func getMP4URL(thumbnailURL string) string {
+	index := strings.Index(thumbnailURL, "-preview")
+	rawUrl := thumbnailURL[:index]
+	rawUrl += ".mp4"
+	return rawUrl
 }

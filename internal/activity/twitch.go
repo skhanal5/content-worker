@@ -31,20 +31,43 @@ type GetClipsInput struct {
 	BroadcasterID string
 }
 
-type GetClipsOutput struct {
-	ClipURLs []string
+type ClipOutput struct {	
+	ID string
+	Title string
+	URL   string
+	ViewCount int
+	Duration float32
+	CreatedAt string
+	ThumbnailURL string
 }
 
-func (a *Activity) GetClipsFromUser(ctx context.Context, input GetClipsInput) ([]string, error) {
+type GetClipsOutput struct {
+	Clips []ClipOutput 
+}
+
+func (a *Activity) GetClipsFromUser(ctx context.Context, input GetClipsInput) (*GetClipsOutput, error) {
 	clips, err := a.GetClips(input.BroadcasterID)
 	if err != nil {
 		return nil, err
 	}
-
-	var clipURLs []string
+	if clips == nil {	
+		return nil, fmt.Errorf("no clips found for broadcaster id: %s", input.BroadcasterID)
+	}
+	
+	clipsOutput := &GetClipsOutput{
+		Clips: make([]ClipOutput, len(clips.Clips)),
+	}
 	for _, clip := range clips.Clips {
-		clipURLs = append(clipURLs, clip.URL)
+		clipsOutput.Clips = append(clipsOutput.Clips, ClipOutput{
+			ID: clip.ID,
+			Title: clip.Title,
+			URL: clip.URL,
+			ViewCount: clip.ViewCount,
+			Duration: clip.Duration,
+			CreatedAt: clip.CreatedAt,
+			ThumbnailURL: clip.ThumbnailURL,
+		})
 	}
 
-	return clipURLs, nil
+	return clipsOutput, nil
 }
