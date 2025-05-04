@@ -1,20 +1,15 @@
 package main
 
 import (
-	"clip-farmer-workflow/internal"
-	"log"
-
-	"go.temporal.io/sdk/client"
+	"clip-farmer-workflow/internal/config"
+	"clip-farmer-workflow/internal/worker"
 )
 
 func main() {
-	temporalClient, err := client.Dial(client.Options{
-		HostPort:  client.DefaultHostPort,
-		Namespace: client.DefaultNamespace,
-	})
-	if err != nil {
-		log.Fatalln("Unable to create Temporal client", err)
-	}
-	defer temporalClient.Close()
-	internal.StartWorker(temporalClient)
+	cfg := config.Config{
+        TwitchClientId:    config.GetEnv("TWITCH_CLIENT_ID", ""),
+		TwitchClientSecret: config.GetEnv("TWITCH_CLIENT", ""),
+		TwitchBaseURL:     config.GetEnv("TWITCH_BASE_URL", "https://api.twitch.tv/helix"),
+    }
+	worker.StartWorker(cfg)
 }

@@ -11,7 +11,7 @@ type GetTwitchUserOutput struct {
 }
 
 func (a *Activity) GetTwitchUser(ctx context.Context, input GetTwitchUserInput) (*GetTwitchUserOutput, error) {
-	broadcaster, err := a.twitchService.GetUsers(input.Username)
+	broadcaster, err := a.GetUsers(input.Username)
 	if err != nil {
 		return nil, err
 	}
@@ -30,7 +30,7 @@ type GetClipsOutput struct {
 }
 
 func (a *Activity) GetClipsFromUser(ctx context.Context, input GetClipsInput) ([]string, error) {
-	clips, err := a.twitchService.GetClips(input.BroadcasterID)
+	clips, err := a.GetClips(input.BroadcasterID)
 	if err != nil {
 		return nil, err
 	}
