@@ -7,23 +7,18 @@ import (
 	"github.com/go-resty/resty/v2"
 )
 
-const (
-	tmpDir = "tmp/id_%s.mp4"
-)
 
 type DownloadManager interface {
-	Download(url string, outputId string) (string, error)
+	Download(url string, filepath string) (string, error)
 }
 
 type DownloadService struct {
 	client *resty.Client
 }
 
-func (d *DownloadService) Download(url string, outputId string) (string, error) {
-	outputFile := fmt.Sprintf(tmpDir, outputId)
-	
+func (d *DownloadService) Download(url string, filepath string) (string, error) {
 	resp, err := d.client.R().
-	SetOutput(outputFile).
+	SetOutput(filepath).
 	Get(url)
 
 	if err != nil {
@@ -32,7 +27,7 @@ func (d *DownloadService) Download(url string, outputId string) (string, error) 
 	if resp.StatusCode() != 200 {
 		return "", fmt.Errorf("failed to download file: %s", resp.Status())
 	}
-	return outputFile, nil
+	return filepath, nil
 }
 
 func NewDownloadService() *DownloadService {

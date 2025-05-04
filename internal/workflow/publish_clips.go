@@ -7,7 +7,7 @@ import (
 )
 
 type PublishClipsInput struct {
-	Username string `json:"username,required"`
+	Streamer string `json:"streamer,required"`
 }
 
 // Note: Temporal doesn't really recommend using child workflows for this use-case.
@@ -22,7 +22,7 @@ func PublishClipsWorkflow(ctx workflow.Context, input PublishClipsInput) (error)
   	ctx = workflow.WithChildOptions(ctx, childWorkflowOptions)
 
 	childInput := RetrieveClipsInput{
-		Username: input.Username,
+		Streamer: input.Streamer,
 	}
 	var result RetrieveClipsOutput
 	err := workflow.ExecuteChildWorkflow(ctx, RetrieveClipsWorkflow, childInput).Get(ctx, &result)
@@ -34,8 +34,9 @@ func PublishClipsWorkflow(ctx workflow.Context, input PublishClipsInput) (error)
 	for _, clip := range result.Clips {
 		mp4Url := getMP4URL(clip.ThumbnailURL)
 		input := DownloadClipInput{
-			ID:  clip.ID,
-			URL: mp4Url,
+			Streamer: input.Streamer,
+			ClipID:  clip.ID,
+			ClipURL: mp4Url,
 		}
 		output := &DownloadClipOutput{}
 		err := workflow.ExecuteActivity(ctx, a.DownloadClip, input).Get(ctx, &output.OutputPath)
@@ -50,12 +51,13 @@ func PublishClipsWorkflow(ctx workflow.Context, input PublishClipsInput) (error)
 /*
 	Given a thumbnail url, replace the preview portion
 	of it with a ".mp4" extension
-	i.e., https://clips-media-assets2.twitch.tv/jTk1-Xmig5ji1Dll05ivnA/AT-cm%7CjTk1-Xmig5ji1Dll05ivnA-preview-260x147.jpg
-	becomes https://clips-media-assets2.twitch.tv/jTk1-Xmig5ji1Dll05ivnA/AT-cm%7CjTk1-Xmig5ji1Dll05ivnA.mp4
+	i.e., https://static-cdn.jtvnw.net/twitch-clips/-x-v1x9bhwciZ23fVnULCQ/AT-cm%7C-x-v1x9bhwciZ23fVnULCQ-preview-480x272.jpg
+	becomes https://clips-media-assets2.twitch.tv/-x-v1x9bhwciZ23fVnULCQ/AT-cm%7C-x-v1x9bhwciZ23fVnULCQ
 */
 func getMP4URL(thumbnailURL string) string {
 	index := strings.Index(thumbnailURL, "-preview")
-	rawUrl := thumbnailURL[:index]
-	rawUrl += ".mp4"
-	return rawUrl
+	rawURL := thumbnailURL[:index]
+    rawURL = strings.Replace(rawURL, "static-cdn.jtvnw.net/twitch-clips", "clips-media-assets2.twitch.tv", 1)
+    rawURL += ".mp4"
+	return rawURL
 }

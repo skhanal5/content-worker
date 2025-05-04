@@ -7,7 +7,7 @@ import (
 )
 
 type RetrieveClipsInput struct {
-	Username string `json:"username,required"`
+	Streamer string `json:"streamer,required"`
 }
 
 type Clip struct {
@@ -30,7 +30,7 @@ func RetrieveClipsWorkflow(ctx workflow.Context, input RetrieveClipsInput) (*Ret
 	var a activity.Activity
 
 	getTwitchUserInput := activity.GetTwitchUserInput{
-		Username: input.Username,
+		Username: input.Streamer,
 	}
 	var userOutput activity.GetTwitchUserOutput
 	err := workflow.ExecuteActivity(ctx, a.GetTwitchUser, getTwitchUserInput).Get(ctx, &userOutput)
@@ -52,6 +52,11 @@ func RetrieveClipsWorkflow(ctx workflow.Context, input RetrieveClipsInput) (*Ret
 	}
 
 	for _, clip := range getClipsOutput.Clips {
+		// TODO: Update type of clip to be optional
+		// Noticed you can get an empty result
+		if clip.ID == "" {
+			continue
+		}
 		output.Clips = append(output.Clips, Clip{
 			ID: clip.ID,
 			Title: clip.Title,

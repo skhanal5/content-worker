@@ -6,8 +6,9 @@ import (
 )
 
 type DownloadClipInput struct {
-	ID  string `json:"id,required"`
-	URL string `json:"url,required"`
+	Streamer string `json:"streamer,required"`
+	ClipID string `json:"clip_id,required"`
+	ClipURL string `json:"clip_url,required"`
 }
 
 type DownloadClipOutput struct {	
@@ -21,8 +22,9 @@ func DownloadClipWorkflow(ctx workflow.Context, input DownloadClipInput) (*Downl
 	var a activity.Activity
 
 	downloadInput := activity.DownloadClipInput{
-		ID:  input.ID,
-		URL: input.URL,
+		Streamer: input.Streamer,
+		ClipID:  input.ClipID,
+		ClipURL: input.ClipURL,
 	}
 	output := &DownloadClipOutput{}
 	err := workflow.ExecuteActivity(ctx, a.DownloadClip, downloadInput).Get(ctx, &output.OutputPath)
