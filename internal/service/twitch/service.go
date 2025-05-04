@@ -14,8 +14,8 @@ const (
 )
 
 type TwitchManager interface {
-	GetBroadcaster(broadcasterId string) (string, error)
-	GetClips(username string) ([]string, error)
+	GetUsers(broadcasterId string) (*UsersResponse, error)
+	GetClips(username string) (*ClipsResponse, error)
 }
 
 type TwitchService struct {
@@ -23,7 +23,7 @@ type TwitchService struct {
 	authURL string
 }
 
-func (t *TwitchService) GetBroadcaster(username string) (*UsersResponse, error) {
+func (t *TwitchService) GetUsers(username string) (*UsersResponse, error) {
 	resp, err := t.client.R().
 		SetQueryParam("first", "1").
 		SetResult(&UsersResponse{}).
