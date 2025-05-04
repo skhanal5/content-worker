@@ -1,15 +1,16 @@
 package activity
 
+import "context"
+
 type GetTwitchUserInput struct {
-	Username string 
+	Username string
 }
 
 type GetTwitchUserOutput struct {
 	BroadcasterID string
 }
 
-
-func (a *Activity) GetTwitchUser(input GetTwitchUserInput) (*GetTwitchUserOutput, error) {
+func (a *Activity) GetTwitchUser(ctx context.Context, input GetTwitchUserInput) (*GetTwitchUserOutput, error) {
 	broadcaster, err := a.twitchService.GetUsers(input.Username)
 	if err != nil {
 		return nil, err
@@ -28,8 +29,7 @@ type GetClipsOutput struct {
 	ClipURLs []string
 }
 
-
-func (a *Activity) GetClipsFromUser(input GetClipsInput) ([]string, error) {
+func (a *Activity) GetClipsFromUser(ctx context.Context, input GetClipsInput) ([]string, error) {
 	clips, err := a.twitchService.GetClips(input.BroadcasterID)
 	if err != nil {
 		return nil, err
