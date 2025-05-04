@@ -3,7 +3,6 @@ package worker
 import (
 	"clip-farmer-workflow/internal/activity"
 	"clip-farmer-workflow/internal/config"
-	"clip-farmer-workflow/internal/service/twitch"
 	"clip-farmer-workflow/internal/workflow"
 	"log"
 
@@ -11,16 +10,9 @@ import (
 	"go.temporal.io/sdk/worker"
 )
 
-func registerServices(cfg config.Config) *activity.Activity {
-	twitchManager := twitch.NewTwitchClient(cfg.TwitchClientId, cfg.TwitchClientSecret, cfg.TwitchBaseURL)
-	return &activity.Activity{
-		TwitchManager: twitchManager,
-	}
-}
-
 
 func registerWorker(client client.Client, cfg config.Config) (worker.Worker, error) {
-	services := registerServices(cfg)
+	services := activity.NewActivity(cfg)
 	worker := worker.New(client, "default", worker.Options{})
 	worker.RegisterWorkflow(workflow.HelloWorldWorkflow)
 	worker.RegisterActivity(services)

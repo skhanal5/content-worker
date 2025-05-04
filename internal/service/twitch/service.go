@@ -70,7 +70,7 @@ func refreshAuthMiddleware(clientId string, clientSecret string) func (c *resty.
 	}
 }
 
-func NewTwitchClient(baseURL string, clientId string, clientSecret string) *TwitchService {
+func NewTwitchService(baseURL string, clientId string, clientSecret string) *TwitchService {
 	return &TwitchService{
 		client: resty.New().
 			SetTimeout(10*time.Second).
