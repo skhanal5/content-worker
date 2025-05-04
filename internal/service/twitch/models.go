@@ -15,7 +15,7 @@ type Clip struct {
 	ViewCount       int    `json:"view_count,omitempty"`
 	CreatedAt       string `json:"created_at,omitempty"`
 	ThumbnailURL    string `json:"thumbnail_url,omitempty"`
-	Duration        int    `json:"duration,omitempty"`
+	Duration        float32    `json:"duration,omitempty"`
 	VodOffset       int    `json:"vod_offset,omitempty"`
 	IsFeatured      bool   `json:"is_featured,omitempty"`
 }
@@ -30,17 +30,16 @@ type ClipsResponse struct {
 }
 
 type User struct {
-	BroadcasterID               string   `json:"broadcaster_id,omitempty"`
-	BroadcasterLogin            string   `json:"broadcaster_login,omitempty"`
-	BroadcasterName             string   `json:"broadcaster_name,omitempty"`
-	BroadcasterLanguage         string   `json:"broadcaster_language,omitempty"`
-	GameID                      string   `json:"game_id,omitempty"`
-	GameName                    string   `json:"game_name,omitempty"`
-	Title                       string   `json:"title,omitempty"`
-	Delay                       int      `json:"delay,omitempty"`
-	Tags                        []string `json:"tags,omitempty"`
-	ContentClassificationLabels []string `json:"content_classification_labels,omitempty"`
-	IsBrandedContent            bool     `json:"is_branded_content,omitempty"`
+	Id               string   `json:"id,omitempty"`
+	Login            string   `json:"login,omitempty"`
+	DisplayNmame             string   `json:"display_name,omitempty"`
+	Type         string   `json:"broadcaster_language,omitempty"`
+	BroadcasterType string   `json:"broadcaster_type,omitempty"`
+	Description       string   `json:"description,omitempty"`
+	ProfileImageURL   string   `json:"profile_image_url,omitempty"`
+	OfflineImageURL    string   `json:"offline_image_url,omitempty"`
+	ViewCount		  int      `json:"view_count,omitempty"`
+	CreatedAt		 string   `json:"created_at,omitempty"`
 }
 
 type UsersResponse struct {

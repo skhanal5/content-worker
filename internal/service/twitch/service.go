@@ -25,7 +25,6 @@ type TwitchService struct {
 
 func (t *TwitchService) GetUsers(username string) (*UsersResponse, error) {
 	resp, err := t.client.R().
-		SetQueryParam("first", "1").
 		SetResult(&UsersResponse{}).
 		Get("/users?login=" + username)
 	if err != nil {
@@ -36,8 +35,7 @@ func (t *TwitchService) GetUsers(username string) (*UsersResponse, error) {
 
 func (t *TwitchService) GetClips(broadcasterId string) (*ClipsResponse, error) {
 	resp, err := t.client.R().
-		SetQueryParam("first", "1").
-		SetResult(&UsersResponse{}).
+		SetResult(&ClipsResponse{}).
 		Get("/clips?broadcaster_id=" + broadcasterId)
 	if err != nil {
 		return &ClipsResponse{}, err
@@ -45,29 +43,52 @@ func (t *TwitchService) GetClips(broadcasterId string) (*ClipsResponse, error) {
 	return resp.Result().(*ClipsResponse), nil
 }
 
-func refreshAuthMiddleware(clientId string, clientSecret string) func(c *resty.Client, res *resty.Response) error {
-	return func(c *resty.Client, res *resty.Response) error {
-		if res.StatusCode() == http.StatusUnauthorized {
-			authURL := fmt.Sprintf(oauthBaseURL)
-			resp, err := c.R().
-				SetQueryParam("client_id", clientId).
-				SetQueryParam("client_secret", clientSecret).
-				SetQueryParam("grant_type", "client_credentials").
-				Post(authURL)
-			if err != nil {
-				return err
-			}
-			if resp.StatusCode() != http.StatusOK {
-				return fmt.Errorf("failed to refresh auth token: %s", resp.String())
-			}
-			var authResponse AuthResponse
-			if err := json.Unmarshal(resp.Body(), &authResponse); err != nil {
-				return err
-			}
-			c.SetHeader("Authorization", "Bearer "+authResponse.AccessToken)
-		}
-		return nil
-	}
+func addAuthHeaderMiddleware(clientId string, clientSecret string) func(c *resty.Client, req *resty.Request) error {
+    return func(c *resty.Client, req *resty.Request) error {
+        token, err := tokenProvider(clientId, clientSecret)()
+        if err != nil {
+            return fmt.Errorf("failed to fetch token: %w", err)
+        }
+
+        req.SetHeader("Authorization", "Bearer "+token)
+        req.SetHeader("Client-ID", clientId)
+
+        return nil
+    }
+}
+
+func tokenProvider(clientId string, clientSecret string) func() (string, error) {
+    var token string
+    var tokenExpiry time.Time
+
+    return func() (string, error) {
+        if token != "" && time.Now().Before(tokenExpiry) {
+            return token, nil
+        }
+
+        resp, err := resty.New().R().
+            SetQueryParam("client_id", clientId).
+            SetQueryParam("client_secret", clientSecret).
+            SetQueryParam("grant_type", "client_credentials").
+            Post(oauthBaseURL)
+        if err != nil {
+            return "", fmt.Errorf("failed to refresh token: %w", err)
+        }
+
+        if resp.StatusCode() != http.StatusOK {
+            return "", fmt.Errorf("failed to refresh token: %s", resp.String())
+        }
+
+        var authResponse AuthResponse
+        if err := json.Unmarshal(resp.Body(), &authResponse); err != nil {
+            return "", fmt.Errorf("failed to parse token response: %w", err)
+        }
+
+        token = authResponse.AccessToken
+        tokenExpiry = time.Now().Add(time.Duration(authResponse.ExpiresIn) * time.Second)
+
+        return token, nil
+    }
 }
 
 func NewTwitchService(baseURL string, clientId string, clientSecret string) *TwitchService {
@@ -75,7 +96,6 @@ func NewTwitchService(baseURL string, clientId string, clientSecret string) *Twi
 		client: resty.New().
 			SetTimeout(10*time.Second).
 			SetBaseURL(baseURL).
-			SetHeader("Client-ID", clientId).
-			OnAfterResponse(refreshAuthMiddleware(clientId, clientSecret)),
+			OnBeforeRequest(addAuthHeaderMiddleware(clientId, clientSecret)),
 	}
 }
