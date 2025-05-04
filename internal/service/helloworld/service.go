@@ -6,6 +6,6 @@ type HelloWorldManager interface {
 
 type HelloWorldService struct{}
 
-func (h HelloWorldService) SayHello(name string) (string) {
+func (h HelloWorldService) SayHello(name string) string {
 	return "Hello, " + name
 }

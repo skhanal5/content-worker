@@ -11,10 +11,10 @@ type Activity struct {
 	twitch.TwitchManager
 }
 
-func NewActivity(cfg config.Config)	*Activity {
+func NewActivity(cfg config.Config) *Activity {
 	twitchManager := twitch.NewTwitchService(cfg.TwitchClientId, cfg.TwitchClientSecret, cfg.TwitchBaseURL)
 	return &Activity{
 		HelloWorldManager: helloworld.HelloWorldService{},
-		TwitchManager: twitchManager,
+		TwitchManager:     twitchManager,
 	}
 }

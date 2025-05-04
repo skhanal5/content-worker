@@ -45,7 +45,7 @@ func (t *TwitchService) GetClips(broadcasterId string) (*ClipsResponse, error) {
 	return resp.Result().(*ClipsResponse), nil
 }
 
-func refreshAuthMiddleware(clientId string, clientSecret string) func (c *resty.Client, res *resty.Response) error {
+func refreshAuthMiddleware(clientId string, clientSecret string) func(c *resty.Client, res *resty.Response) error {
 	return func(c *resty.Client, res *resty.Response) error {
 		if res.StatusCode() == http.StatusUnauthorized {
 			authURL := fmt.Sprintf(oauthBaseURL)
@@ -66,7 +66,7 @@ func refreshAuthMiddleware(clientId string, clientSecret string) func (c *resty.
 			}
 			c.SetHeader("Authorization", "Bearer "+authResponse.AccessToken)
 		}
-		return nil	
+		return nil
 	}
 }
 

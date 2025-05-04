@@ -10,7 +10,6 @@ import (
 	"go.temporal.io/sdk/worker"
 )
 
-
 func registerWorker(client client.Client, cfg config.Config) (worker.Worker, error) {
 	services := activity.NewActivity(cfg)
 	worker := worker.New(client, "default", worker.Options{})
