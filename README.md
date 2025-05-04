@@ -5,6 +5,14 @@ Implementing the original [clip-farmer project](https://github.com/skhanal5/clip
 
 ### Development
 
+#### Environment Variables
+You will need the following environment variables defined to run the main workflow:
+```bash
+export TWITCH_CLIENT_ID="FOO"
+export TWITCH_CLIENT_SECRET="BAR"
+export TWITCH_BASE_URL="BAZ"
+```
+
 #### Running against the Local Temporal Server
 
 1. Install the Temporal CLI using `brew` if you don't have it installed already. 
