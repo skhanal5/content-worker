@@ -1,6 +1,9 @@
 package activity
 
-import "context"
+import (
+	"context"
+	"fmt"
+)
 
 type GetTwitchUserInput struct {
 	Username string
@@ -11,11 +14,14 @@ type GetTwitchUserOutput struct {
 }
 
 func (a *Activity) GetTwitchUser(ctx context.Context, input GetTwitchUserInput) (*GetTwitchUserOutput, error) {
-	broadcaster, err := a.GetUsers(input.Username)
+	response, err := a.GetUsers(input.Username)
 	if err != nil {
 		return nil, err
 	}
-	id := broadcaster.Users[0].BroadcasterID
+	if response == nil {
+		return nil, fmt.Errorf("no users found for username: %s", input.Username)
+	}
+	id := response.Users[0].Id
 	return &GetTwitchUserOutput{
 		BroadcasterID: id,
 	}, nil

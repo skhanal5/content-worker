@@ -7,7 +7,7 @@ GO_FILES := $(shell find . -type f -name '*.go')
 GOOS:=windows 
 GOARCH:=amd64
 
-.PHONY: all build run clean test fmt lint
+.PHONY: all build run clean test fmt lint server
 
 all: build
 
@@ -37,3 +37,7 @@ fmt:
 lint:
 	@echo "Linting code..."
 	@golangci-lint run
+
+server:
+	@echo "Starting server..."
+	temporal server start-dev --ui-port 8080

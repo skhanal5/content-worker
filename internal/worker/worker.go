@@ -14,6 +14,7 @@ func registerWorker(client client.Client, cfg config.Config) (worker.Worker, err
 	services := activity.NewActivity(cfg)
 	worker := worker.New(client, "default", worker.Options{})
 	worker.RegisterWorkflow(workflow.HelloWorldWorkflow)
+	worker.RegisterWorkflow(workflow.RetrieveClipsWorkflow)
 	worker.RegisterActivity(services)
 	return worker, nil
 }
