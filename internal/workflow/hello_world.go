@@ -15,8 +15,9 @@ type HelloWorldOutput struct {
 
 func HelloWorldWorkflow(ctx workflow.Context, input HelloWorldInput) (*HelloWorldOutput, error) {
 	ctx = workflow.WithActivityOptions(ctx, ActivityOptions)
+	var a activity.Activity
 	var output HelloWorldOutput
-	err := workflow.ExecuteActivity(ctx, activity.HelloWorldActivity, input.Name).Get(ctx, &output.Message)
+	err := workflow.ExecuteActivity(ctx, a.HelloWorldActivity, input.Name).Get(ctx, &output.Message)
 	if err != nil {
 		return nil, err
 	}
