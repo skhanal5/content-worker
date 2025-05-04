@@ -19,14 +19,20 @@ func RetrieveClipsWorkflow(ctx workflow.Context, input RetrieveClipsInput) (*Ret
 
 	var a activity.Activity
 
+	getTwitchUserInput := activity.GetTwitchUserInput{
+		Username: input.Username,
+	}
 	var userOutput activity.GetTwitchUserOutput
-	err := workflow.ExecuteActivity(ctx, a.GetTwitchUser, input.Username).Get(ctx, &userOutput)
+	err := workflow.ExecuteActivity(ctx, a.GetTwitchUser, getTwitchUserInput).Get(ctx, &userOutput)
 	if err != nil {
 		return nil, err
 	}
 
+	getClipsInput := activity.GetClipsInput{
+		BroadcasterID: userOutput.BroadcasterID,
+	}
 	var clipsOutput RetrieveClipsOutput
-	err = workflow.ExecuteActivity(ctx, a.GetClipsFromUser, userOutput.BroadcasterID).Get(ctx, &clipsOutput.ClipURLs)
+	err = workflow.ExecuteActivity(ctx, a.GetClipsFromUser, getClipsInput).Get(ctx, &clipsOutput.ClipURLs)
 	if err != nil {
 		return nil, err
 	}
