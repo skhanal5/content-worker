@@ -38,3 +38,5 @@ export TWITCH_BASE_URL="BAZ"
     ```
 
 5. View the results of the workflow on the UI ![alt text](./static/image.png)
+
+You can refer to the `./sample_workflows` directory to see the other workflows that can be executed using this worker
