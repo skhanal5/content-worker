@@ -12,7 +12,7 @@ GOARCH:=amd64
 all: build
 
 # Note: the exe extension for windows
-build: $(GO_FILES)
+build: clean $(GO_FILES)
 	@echo "Building $(APP_NAME)..."
 	@mkdir -p $(BUILD_DIR)
 	@GOOS=$(GOOS) GOARCH=$(GOARCH) go build -o $(BUILD_DIR)/$(APP_NAME).exe $(SRC_DIR)/main.go
