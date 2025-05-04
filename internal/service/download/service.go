@@ -17,6 +17,10 @@ type DownloadService struct {
 }
 
 func (d *DownloadService) Download(url string, filepath string) (string, error) {
+	if url == "" {
+        return "", fmt.Errorf("url cannot be empty")
+    }
+	
 	resp, err := d.client.R().
 	SetOutput(filepath).
 	Get(url)

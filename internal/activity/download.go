@@ -2,7 +2,7 @@ package activity
 
 import (
 	"context"
-	"path/filepath"
+	"fmt"
 )
 
 type DownloadClipInput struct {
@@ -17,7 +17,7 @@ const (
 
 
 func (a *Activity) DownloadClip(ctx context.Context, input DownloadClipInput) (string, error) {
-	filepath := filepath.Join(tmpDir, input.Streamer, input.ClipID)
+	filepath := fmt.Sprintf(tmpDir, input.Streamer, input.ClipID)
 	output, err := a.DownloadManager.Download(input.ClipURL, filepath)
 	if err != nil {
 		return "", err
