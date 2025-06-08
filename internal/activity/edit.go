@@ -4,6 +4,7 @@ import (
 	"clip-farmer-workflow/internal/service/edit"
 	"context"
 	"fmt"
+	"log"
 )
 
 type VideoStrategyType string
@@ -33,6 +34,7 @@ func (a Activity) getStrategy(strategyType VideoStrategyType) (edit.EditingStrat
 func (a *Activity) EditVideo(ctx context.Context, input EditVideoInput) (error) {
 
 	strategy,err := a.getStrategy(input.Strategy)
+	log.Printf("Using strategy: %v", strategy)
 	
 	if err != nil {
 		return err
