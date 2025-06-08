@@ -21,7 +21,7 @@ func EditWorkflow(ctx workflow.Context, input EditWorkflowInput) error {
 	ao := workflow.ActivityOptions{
 		RetryPolicy: retryPolicy,
         StartToCloseTimeout:    time.Second * 180,
-        HeartbeatTimeout:       time.Second * 10,
+        HeartbeatTimeout:       time.Second * 15,
 	}
 
 	ctx = workflow.WithActivityOptions(ctx, ao)

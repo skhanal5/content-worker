@@ -4,7 +4,8 @@ import (
 	"clip-farmer-workflow/internal/service/edit"
 	"context"
 	"fmt"
-	"log"
+	"time"
+	"go.temporal.io/sdk/activity"
 )
 
 type VideoStrategyType string
@@ -32,18 +33,37 @@ func (a Activity) getStrategy(strategyType VideoStrategyType) (edit.EditingStrat
 }
 
 func (a *Activity) EditVideo(ctx context.Context, input EditVideoInput) (error) {
-
+    logger := activity.GetLogger(ctx)
 	strategy,err := a.getStrategy(input.Strategy)
-	log.Printf("Using strategy: %v", strategy)
+	logger.Info("Using strategy:", strategy)
+
+	stop := make(chan struct{})
+    go func() {
+        ticker := time.NewTicker(10 * time.Second)
+        defer ticker.Stop()
+        for {
+            select {
+            case <-ticker.C:
+                activity.RecordHeartbeat(ctx)
+                logger.Info("Heartbeat sent during render")
+            case <-stop:
+                return
+            }
+        }
+    }()
 	
 	if err != nil {
 		return err
 	}
 
 	err = a.EditManager.Render(input.InputPath, input.OutputPath, strategy)
-	
+	close(stop)
+
 	if err != nil {
+		logger.Error("Render failed", "error", err)
 		return err
 	}
+
+	logger.Info("Video editing complete")
 	return nil
 }
