@@ -3,7 +3,7 @@ temporal workflow start \
     --task-queue default \
     --type EditWorkflow \
     --input '{
-        "input_path":"./tmp/creator_plaqueboymax/id_BlatantGlamorousSharkSoonerLater-fowLZFq4QkVdSnrd.mp4",
-        "output_path":"./edit/video.mp4",
+        "input_directory":"tmp/creator_plaqueboymax",
+        "output_directory":"edit",
         "strategy": "blurred_overlay"
     }'
