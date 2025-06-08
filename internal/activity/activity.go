@@ -17,7 +17,7 @@ type Activity struct {
 
 func NewActivity(cfg config.Config) *Activity {
 	helloManager := helloworld.HelloWorldService{}
-	twitchManager := twitch.NewTwitchService(cfg.TwitchBaseURL, cfg.TwitchClientId, cfg.TwitchClientSecret)
+	twitchManager := twitch.NewTwitchService(cfg.TwitchClientId, cfg.TwitchClientSecret)
 	downloadManager := download.NewDownloadService()
 	editManager := edit.EditService{}
 	return &Activity{
