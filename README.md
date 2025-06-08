@@ -1,7 +1,13 @@
-## clip-farmer-workflow
+## content-worker
 
 ### About
 Implementing the original [clip-farmer project](https://github.com/skhanal5/clip-farmer) as a Temporal Workflow. The goal is to be able to distribute the end to end flow of producing short form content with durable execution. 
+
+### Disclaimer
+
+This project is intended for educational purposes only. The author(s) of this project are not liable for any misuse or damage that may arise from the use of this project. Users of this project are responsible for ensuring that their use complies with all applicable laws, terms of service, and policies of third-party services.
+
+Please use this project responsibly and ethically.
 
 ### Development
 
