@@ -10,6 +10,7 @@ import (
 )
 
 const (
+    helixBaseURL = "https://api.twitch.tv/helix"
 	oauthBaseURL = "https://id.twitch.tv/oauth2/token"
 )
 
@@ -91,11 +92,11 @@ func tokenProvider(clientId string, clientSecret string) func() (string, error) 
     }
 }
 
-func NewTwitchService(baseURL string, clientId string, clientSecret string) *TwitchService {
+func NewTwitchService(clientId string, clientSecret string) *TwitchService {
 	return &TwitchService{
 		client: resty.New().
 			SetTimeout(10*time.Second).
-			SetBaseURL(baseURL).
+			SetBaseURL(helixBaseURL).
 			OnBeforeRequest(addAuthHeaderMiddleware(clientId, clientSecret)),
 	}
 }

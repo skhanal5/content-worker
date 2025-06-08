@@ -9,7 +9,6 @@ func main() {
 	cfg := config.Config{
 		TwitchClientId:     config.GetEnv("TWITCH_CLIENT_ID", ""),
 		TwitchClientSecret: config.GetEnv("TWITCH_CLIENT_SECRET", ""),
-		TwitchBaseURL:      config.GetEnv("TWITCH_BASE_URL", "https://api.twitch.tv/helix"),
 	}
 	worker.StartWorker(cfg)
 }

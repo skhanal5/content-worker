@@ -17,6 +17,7 @@ func registerWorker(client client.Client, cfg config.Config) (worker.Worker, err
 	worker.RegisterWorkflow(workflow.RetrieveClipsWorkflow)
 	worker.RegisterWorkflow(workflow.DownloadClipWorkflow)
 	worker.RegisterWorkflow(workflow.PublishClipsWorkflow)
+	worker.RegisterWorkflow(workflow.EditWorkflow)
 	worker.RegisterActivity(services)
 	return worker, nil
 }
