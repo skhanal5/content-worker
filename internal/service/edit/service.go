@@ -1,7 +1,7 @@
 package edit
 
 type EditManager interface {
-	Render(inputPath string, outputPath string, strategy EditingStrategy) error
+	Render(inputPath string, outputPath string, strategy EditingStrategy, title string) error
 }
 
 type EditService struct {

@@ -3,6 +3,7 @@ package edit
 import (
 	"fmt"
 	"log"
+	"strings"
 
 	ffmpeg_go "github.com/u2takey/ffmpeg-go"
 )
@@ -31,14 +32,14 @@ func (b *BlurredOverlayStrategy) Process(inputPath string, outputPath string, ti
 	)
 
 	textOverlayed := overlayed.Filter("drawtext", ffmpeg_go.Args{
-		fmt.Sprintf("text=%s", title),
-		"fontsize=48",
+		fmt.Sprintf("text=%s", strings.ToUpper(title)),
+		"fontfile=font/Montserrat-Bold.ttf",
+		"fontsize=72",
 		"fontcolor=white",
 		"x=(w-text_w)/2",
-		"y=h-100",
-		"box=1",
-		"boxcolor=black@0.5",
-		"boxborderw=10",
+		"y=550",
+		"borderw=10",
+		"bordercolor=black",
 	})
 
 

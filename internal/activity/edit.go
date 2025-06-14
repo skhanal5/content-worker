@@ -58,7 +58,7 @@ func (a *Activity) EditVideo(ctx context.Context, input EditVideoInput) (error) 
         }
     }()
 	
-	err = a.EditManager.Render(input.InputPath, input.OutputPath, strategy)
+	err = a.EditManager.Render(input.InputPath, input.OutputPath, strategy, input.Title)
 	close(stop)
 
 	if err != nil {
