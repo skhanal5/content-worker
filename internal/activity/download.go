@@ -16,11 +16,11 @@ const (
 )
 
 
-func (a *Activity) DownloadClip(ctx context.Context, input DownloadClipInput) (string, error) {
+func (a *Activity) DownloadClip(ctx context.Context, input DownloadClipInput) error {
 	filepath := fmt.Sprintf(tmpDir, input.Streamer, input.ClipID)
-	output, err := a.DownloadManager.Download(input.ClipURL, filepath)
+	err := a.DownloadManager.Download(input.ClipURL, filepath)
 	if err != nil {
-		return "", err
+		return err
 	}
-	return output, nil
+	return nil
 }

@@ -27,25 +27,15 @@ func (a *Activity) GetTwitchUser(ctx context.Context, input GetTwitchUserInput) 
 	}, nil
 }
 
-type GetClipsInput struct {
+type GetClipSlugsInput struct {
 	BroadcasterID string
 }
 
-type ClipOutput struct {	
-	ID string
-	Title string
-	URL   string
-	ViewCount int
-	Duration float32
-	CreatedAt string
-	ThumbnailURL string
+type GetClipSlugsOutput struct {
+	ClipIds []string 
 }
 
-type GetClipsOutput struct {
-	Clips []ClipOutput 
-}
-
-func (a *Activity) GetClipsFromUser(ctx context.Context, input GetClipsInput) (*GetClipsOutput, error) {
+func (a *Activity) GetClipSlugs(ctx context.Context, input GetClipSlugsInput) (*GetClipSlugsOutput, error) {
 	clips, err := a.GetClips(input.BroadcasterID)
 	if err != nil {
 		return nil, err
@@ -54,20 +44,37 @@ func (a *Activity) GetClipsFromUser(ctx context.Context, input GetClipsInput) (*
 		return nil, fmt.Errorf("no clips found for broadcaster id: %s", input.BroadcasterID)
 	}
 	
-	clipsOutput := &GetClipsOutput{
-		Clips: make([]ClipOutput, len(clips.Clips)),
+	clipsOutput := &GetClipSlugsOutput{
+		ClipIds: []string{},
 	}
 	for _, clip := range clips.Clips {
-		clipsOutput.Clips = append(clipsOutput.Clips, ClipOutput{
-			ID: clip.ID,
-			Title: clip.Title,
-			URL: clip.URL,
-			ViewCount: clip.ViewCount,
-			Duration: clip.Duration,
-			CreatedAt: clip.CreatedAt,
-			ThumbnailURL: clip.ThumbnailURL,
-		})
+		if clip.Duration < 15 || clip.ID == ""{
+			continue
+		}
+		clipsOutput.ClipIds = append(clipsOutput.ClipIds, clip.ID)
 	}
 
 	return clipsOutput, nil
+}
+
+type GetDownloadLinksInput struct {
+	ClipIds []string
+}
+
+type GetDownloadLinksOutput struct {
+	DownloadLinks []string 
+}
+
+func (a *Activity) GetDownloadLinks(ctx context.Context,  input GetDownloadLinksInput) (*GetDownloadLinksOutput, error) {
+	output := &GetDownloadLinksOutput{
+		DownloadLinks: []string{},
+	}
+	for _, clipId := range input.ClipIds {
+		res, err := a.GetDownloadLink(clipId)
+		if err != nil {
+			return nil, err
+		}
+		output.DownloadLinks = append(output.DownloadLinks, res)
+	}
+	return output, nil
 }

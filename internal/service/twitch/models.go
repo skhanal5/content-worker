@@ -52,3 +52,29 @@ type AuthResponse struct {
 	ExpiresIn   int    `json:"expires_in,omitempty"`
 	TokenType   string `json:"token_type,omitempty"`
 }
+
+
+type GraphQLResponse struct {
+	Data ClipData `json:"data"`
+}
+
+type ClipData struct {
+	Clip ClipMetadata `json:"clip"`
+}
+
+type ClipMetadata struct {
+	Slug                string               `json:"slug"`
+	PlaybackAccessToken  PlaybackAccessToken  `json:"playbackAccessToken"`
+	VideoQualities       []VideoQuality       `json:"videoQualities"`
+}
+
+type PlaybackAccessToken struct {
+	Signature string `json:"signature"`
+	Value     string `json:"value"`
+}
+
+type VideoQuality struct {
+	Quality   string  `json:"quality"`
+	FrameRate float64 `json:"frameRate"`
+	SourceURL string  `json:"sourceURL"`
+}
