@@ -11,12 +11,15 @@ Please use this project responsibly and ethically.
 
 ### Development
 
+#### Dependencies
+You will need ffmpeg installed to use this. All workflows that involve editing functionality make use of ffmpeg via the go-ffmpeg library. 
+
 #### Environment Variables
 You will need the following environment variables defined to run the main workflow:
 ```bash
-export TWITCH_CLIENT_ID="FOO"
-export TWITCH_CLIENT_SECRET="BAR"
-export TWITCH_BASE_URL="BAZ"
+export HELIX_CLIENT_ID="FOO"
+export HELIX_SECRET="BAR"
+export GQL_CLIENT_ID="BAZ"
 ```
 
 #### Running against the Local Temporal Server

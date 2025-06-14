@@ -20,6 +20,7 @@ type EditVideoInput struct {
 	InputPath string
 	OutputPath string
 	Strategy VideoStrategyType
+	Title string
 }
 
 
@@ -33,10 +34,15 @@ func (a Activity) getStrategy(strategyType VideoStrategyType) (edit.EditingStrat
 }
 
 func (a *Activity) EditVideo(ctx context.Context, input EditVideoInput) (error) {
-    logger := activity.GetLogger(ctx)
-	strategy,err := a.getStrategy(input.Strategy)
-	logger.Info("Using strategy:", strategy)
+	logger := activity.GetLogger(ctx)		
+	logger.Info("Kicking off Edit Video Activity")
 
+	strategy,err := a.getStrategy(input.Strategy)	
+	if err != nil {
+		return err
+	}
+
+	
 	stop := make(chan struct{})
     go func() {
         ticker := time.NewTicker(10 * time.Second)
@@ -52,18 +58,13 @@ func (a *Activity) EditVideo(ctx context.Context, input EditVideoInput) (error) 
         }
     }()
 	
-	if err != nil {
-		return err
-	}
-
-	err = a.EditManager.Render(input.InputPath, input.OutputPath, strategy)
+	err = a.EditManager.Render(input.InputPath, input.OutputPath, strategy, input.Title)
 	close(stop)
 
 	if err != nil {
-		logger.Error("Render failed", "error", err)
-		return err
+		return fmt.Errorf("Edit Video Activity failed with err: %v", err)
 	}
 
-	logger.Info("Video editing complete")
+	logger.Info("Finished Edit Video Activity")
 	return nil
 }

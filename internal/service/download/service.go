@@ -9,16 +9,16 @@ import (
 
 
 type DownloadManager interface {
-	Download(url string, filepath string) (string, error)
+	Download(url string, filepath string) error
 }
 
 type DownloadService struct {
 	client *resty.Client
 }
 
-func (d *DownloadService) Download(url string, filepath string) (string, error) {
+func (d *DownloadService) Download(url string, filepath string) error {
 	if url == "" {
-        return "", fmt.Errorf("url cannot be empty")
+        return fmt.Errorf("url cannot be empty")
     }
 	
 	resp, err := d.client.R().
@@ -26,12 +26,12 @@ func (d *DownloadService) Download(url string, filepath string) (string, error) 
 	Get(url)
 
 	if err != nil {
-		return "", err
+		return err
 	}
 	if resp.StatusCode() != 200 {
-		return "", fmt.Errorf("failed to download file: %s", resp.Status())
+		return fmt.Errorf("failed to download file: %s", resp.Status())
 	}
-	return filepath, nil
+	return nil
 }
 
 func NewDownloadService() *DownloadService {
