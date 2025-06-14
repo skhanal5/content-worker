@@ -2,7 +2,9 @@ package workflow
 
 import (
 	"clip-farmer-workflow/internal/activity"
+	"fmt"
 	"log"
+	"os"
 	"time"
 
 	"go.temporal.io/sdk/workflow"
@@ -10,7 +12,7 @@ import (
 
 type EditSingleWorkflowInput struct {
 	InputPath string `json:"input_path,required"`
-	OutputPath string `json:"output_path,required"`
+	OutputDirectory string `json:"output_directory,required"`
 	Strategy string `json:"strategy,required"`
 	Title string `json:"title,required"`
 }
@@ -27,14 +29,23 @@ func EditSingleWorkflow(ctx workflow.Context, input EditSingleWorkflowInput) err
 	var a activity.Activity
 	log.Printf("Kicking off Single Edit Workflow with payload: %s", input)
 	
+	outputDir := input.OutputDirectory
+	err := os.MkdirAll(outputDir, os.ModePerm)
+	if err != nil {
+		log.Printf("Cannot find the output directory: %v", err)
+		return err
+	}
+
+	outputPath := fmt.Sprintf("%s/%s.mp4", outputDir, input.Title)
+		
 	editInput := activity.EditVideoInput{
 		InputPath: input.InputPath,
-		OutputPath:  input.OutputPath,
+		OutputPath:  outputPath,
 		Strategy: activity.VideoStrategyType(input.Strategy),
 		Title: input.Title,
 	}
 
-	err := workflow.ExecuteActivity(ctx, a.EditVideo, editInput).Get(ctx, nil)
+	err = workflow.ExecuteActivity(ctx, a.EditVideo, editInput).Get(ctx, nil)
 	if err != nil {
 		return err
 	}
