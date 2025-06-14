@@ -8,6 +8,6 @@ type EditService struct {
 }
 
 
-func (e EditService) Render(inputPath string, outputPath string, strategy EditingStrategy) error {
-	return strategy.Process(inputPath, outputPath)
+func (e EditService) Render(inputPath string, outputPath string, strategy EditingStrategy, title string) error {
+	return strategy.Process(inputPath, outputPath, title)
 }
