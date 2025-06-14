@@ -9,14 +9,14 @@ import (
 	"go.temporal.io/sdk/workflow"
 )
 
-type EditWorkflowInput struct {
+type EditMultipleWorkflowInput struct {
 	InputDirectory string `json:"input_directory,required"`
 	OutputDirectory string `json:"output_directory,required"`
 	Strategy string `json:"strategy,required"`
 }
 
 
-func EditWorkflow(ctx workflow.Context, input EditWorkflowInput) error {
+func EditMultipleWorkflow(ctx workflow.Context, input EditMultipleWorkflowInput) error {
 	
 	ao := workflow.ActivityOptions{
 		RetryPolicy: retryPolicy,

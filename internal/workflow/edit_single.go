@@ -8,14 +8,14 @@ import (
 	"go.temporal.io/sdk/workflow"
 )
 
-type SingleEditWorkflowInput struct {
+type EditSingleWorkflowInput struct {
 	InputPath string `json:"input_path,required"`
 	OutputPath string `json:"output_path,required"`
 	Strategy string `json:"strategy,required"`
 	Title string `json:"title,required"`
 }
 
-func SingleEditWorkflow(ctx workflow.Context, input SingleEditWorkflowInput) error {
+func EditSingleWorkflow(ctx workflow.Context, input EditSingleWorkflowInput) error {
 
 	ao := workflow.ActivityOptions{
 		RetryPolicy: retryPolicy,
