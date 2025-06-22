@@ -33,14 +33,14 @@ var styleOptionRegistry = map[EditStyle][]edit.Option{
     },
     BlurredOverlayStretched: {
         edit.WithTemplate(edit.TemplateBlurred),
-        edit.WithForegroundSize(1080, 1080),
+        edit.WithForegroundSize(1080, 906),
     },
     BlackOverlay: {
         edit.WithTemplate(edit.TemplateBlack),
     },
     BlackOverlayStretched: {
 		edit.WithTemplate(edit.TemplateBlack),
-       	edit.WithForegroundSize(1080, 1080),
+       	edit.WithForegroundSize(1080, 906),
     },
     ImageOverlay: {
         edit.WithTemplate(edit.TemplateBlack),
