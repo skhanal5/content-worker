@@ -57,9 +57,8 @@ func buildFFmpegCommand(inputPath, outputPath string, options *EditOptions) (*ff
 }
 
 func blackBackground() *ffmpeg_go.Stream {
-    return ffmpeg_go.Input("color=black", ffmpeg_go.KwArgs{
+    return ffmpeg_go.Input(fmt.Sprintf("color=size=%dx%d:color=black", CanvasSize.Width, CanvasSize.Height), ffmpeg_go.KwArgs{
         "f": "lavfi",
-        "s": fmt.Sprintf("%dx%d", CanvasSize.Width, CanvasSize.Height),
     })
 }
 
