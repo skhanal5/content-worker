@@ -45,13 +45,23 @@ func buildFFmpegCommand(inputPath, outputPath string, options *EditOptions) (*ff
     y := (CanvasSize.Height - options.ForegroundSize.Height) / 2
 
 
- 	output := ffmpeg_go.
-        Filter([]*ffmpeg_go.Stream{bgStream, fgStream}, "overlay", ffmpeg_go.Args{
+    video := ffmpeg_go.Filter(
+        []*ffmpeg_go.Stream{bgStream, fgStream},
+        "overlay",
+        ffmpeg_go.Args{
             fmt.Sprintf("x=%d", x),
             fmt.Sprintf("y=%d", y),
-            "shortest=1",
-        }).
-        Output(outputPath)
+        },
+    )
+
+    
+    output := ffmpeg_go.Output([]*ffmpeg_go.Stream{video}, outputPath,
+		ffmpeg_go.KwArgs{
+			"map":   "0:a",
+			"c:a":   "copy",
+			"shortest": "",
+			"y":     "",
+		})
 
     return output, nil
 }
