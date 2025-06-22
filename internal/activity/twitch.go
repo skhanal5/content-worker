@@ -1,8 +1,10 @@
 package activity
 
 import (
+	"clip-farmer-workflow/internal/service/twitch"
 	"context"
 	"fmt"
+	"sort"
 )
 
 type GetTwitchUserInput struct {
@@ -30,6 +32,7 @@ func (a *Activity) GetTwitchUser(ctx context.Context, input GetTwitchUserInput) 
 type GetClipSlugsInput struct {
 	BroadcasterID string
 	DaysAgo       int
+	TopN int
 }
 
 type GetClipSlugsOutput struct {
@@ -37,6 +40,8 @@ type GetClipSlugsOutput struct {
 }
 
 func (a *Activity) GetClipSlugs(ctx context.Context, input GetClipSlugsInput) (*GetClipSlugsOutput, error) {
+	topN := input.TopN
+	
 	clips, err := a.GetClips(input.BroadcasterID, input.DaysAgo)
 	if err != nil {
 		return nil, err
@@ -45,17 +50,30 @@ func (a *Activity) GetClipSlugs(ctx context.Context, input GetClipSlugsInput) (*
 		return nil, fmt.Errorf("no clips found for broadcaster id: %s", input.BroadcasterID)
 	}
 
-	clipsOutput := &GetClipSlugsOutput{
-		ClipIds: []string{},
-	}
+	filteredClips := []twitch.Clip{} 
 	for _, clip := range clips.Clips {
-		if clip.Duration < 15 || clip.ID == "" {
-			continue
+		if clip.Duration >= 15 && clip.ID != "" {
+			filteredClips = append(filteredClips, clip)
 		}
-		clipsOutput.ClipIds = append(clipsOutput.ClipIds, clip.ID)
 	}
 
+	sort.Slice(filteredClips, func(i, j int) bool {
+		return filteredClips[i].ViewCount > filteredClips[j].ViewCount
+	})
+
+	if input.TopN > len(filteredClips) {
+		topN = len(filteredClips)
+	}
+	topClips := filteredClips[:topN]
+
+	clipsOutput := &GetClipSlugsOutput{
+		ClipIds: make([]string, 0, topN),
+	}
+	for _, clip := range topClips {
+		clipsOutput.ClipIds = append(clipsOutput.ClipIds, clip.ID)
+	}
 	return clipsOutput, nil
+
 }
 
 type GetDownloadLinksInput struct {
