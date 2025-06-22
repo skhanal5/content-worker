@@ -56,13 +56,13 @@ func WithTemplate(t TemplateType) Option {
         switch t {
         case TemplateBlurred:
             o.Background = BlurredVideo
-            o.ForegroundSize = Size{720, 1280}
+            o.ForegroundSize = Size{1080, 607}
         case TemplateBlack:
             o.Background = BlackScreen
-            o.ForegroundSize = Size{720, 1280}
+            o.ForegroundSize = Size{1080, 607}
         case TemplateImage:
             o.Background = StaticImage
-            o.ForegroundSize = Size{720, 1280}
+            o.ForegroundSize = Size{1080, 607}
         }
     }
 }

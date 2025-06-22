@@ -11,6 +11,9 @@ func Render(inputPath, outputPath string, opts ...Option) error {
 		return err
 	}
 
-	return cmd.Run()
+	return cmd.
+		OverWriteOutput().
+		ErrorToStdOut().
+		Run()
 }
 

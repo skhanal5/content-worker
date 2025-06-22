@@ -29,13 +29,17 @@ func buildFFmpegCommand(inputPath, outputPath string, options *EditOptions) (*ff
 			return nil, fmt.Errorf("unsupported background type: %v", options.Background)
 	}
 
+    if options.Title != "" {
+        filterArgs := buildTitleArgs(options.Title)
+        for _, args := range filterArgs {
+            bgStream = bgStream.Filter("drawtext", args)
+        }
+    }
+
     fgStream := input.
         Filter("scale", ffmpeg_go.Args{fmt.Sprintf("%d:%d", options.ForegroundSize.Width, options.ForegroundSize.Height)}).
         Filter("format", ffmpeg_go.Args{"yuv420p"})
 
-	if options.Title != "" {
-    	fgStream = fgStream.Filter("drawtext", buildTitleFilter(options.Title))
-	}
 
 	x := (CanvasSize.Width - options.ForegroundSize.Width) / 2
     y := (CanvasSize.Height - options.ForegroundSize.Height) / 2
@@ -47,7 +51,7 @@ func buildFFmpegCommand(inputPath, outputPath string, options *EditOptions) (*ff
             fmt.Sprintf("y=%d", y),
             "shortest=1",
         }).
-        Output(outputPath, ffmpeg_go.KwArgs{"y": nil})
+        Output(outputPath)
 
     return output, nil
 }
@@ -89,23 +93,54 @@ func imageBackground(imagePath string) *ffmpeg_go.Stream {
     return scaledAndCropped
 }
 
+func splitTextIntoLines(text string, maxWidth int) []string {
+    uppercaseText := strings.ToUpper(text)
+    words := strings.Fields(uppercaseText)
+    var lines []string
+    var currentLine string
 
-func buildTitleFilter(title string) ffmpeg_go.Args {
-    args := []string{
-        fmt.Sprintf("text='%s'", escapeText(title)),
-        "fontfile=font/Montserrat-Bold.ttf",
-        "fontsize=72",
-        "fontcolor=white",
-        "x=(w-text_w)/2",
-        "y=50",
-        "borderw=10",
-        "bordercolor=black",
+    for _, word := range words {
+        if len(currentLine)+len(word)+1 > maxWidth { 
+            if currentLine != "" {
+                lines = append(lines, currentLine)
+            }
+            currentLine = word
+        } else {
+            if currentLine != "" {
+                currentLine += " "
+            }
+            currentLine += word
+        }
     }
 
-    return ffmpeg_go.Args{strings.Join(args, ":")}
+    if currentLine != "" {
+        lines = append(lines, currentLine)
+    }
+
+    return lines
 }
 
-func escapeText(text string) string {
-    text = strings.ReplaceAll(text, `\`, `\\`)
-    return strings.ReplaceAll(text, ":", `\:`)
+func buildTitleArgs(title string) []ffmpeg_go.Args {
+    const charactersPerLine = 20
+    const startY = 480
+    const lineHeight = 80
+
+    lines := splitTextIntoLines(title, charactersPerLine)
+    var argsList []ffmpeg_go.Args
+    for i, line := range lines {
+        escapedLine := line
+        args := []string{
+            fmt.Sprintf("text='%s'", escapedLine),
+            "fontfile=font/Montserrat-Bold.ttf",
+            "fontsize=72",
+            "fontcolor=white",
+            "x=(w-text_w)/2",
+            fmt.Sprintf("y=%d", startY+i*lineHeight),
+            "borderw=10",
+            "bordercolor=black",
+        }
+        argsList = append(argsList, ffmpeg_go.Args{strings.Join(args, ":")})
+    }
+
+    return argsList
 }
