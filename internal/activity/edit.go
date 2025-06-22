@@ -4,7 +4,9 @@ import (
 	"clip-farmer-workflow/internal/service/edit"
 	"context"
 	"fmt"
+	"os"
 	"time"
+
 	"go.temporal.io/sdk/activity"
 )
 
@@ -80,4 +82,8 @@ func (a *Activity) EditVideo(ctx context.Context, input EditVideoInput) (error) 
 
 	logger.Info("Finished Edit Video Activity")
 	return nil
+}
+
+func (a *Activity) DeleteTmpVideo(ctx context.Context, inputPath string) (error) {
+    return os.Remove(inputPath)
 }
