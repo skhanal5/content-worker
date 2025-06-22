@@ -75,7 +75,7 @@ func (a *Activity) EditVideo(ctx context.Context, input EditVideoInput) (error) 
 	close(stop)
 
 	if err != nil {
-		return fmt.Errorf("Edit Video Activity failed with err: %v", err)
+		return fmt.Errorf("edit Video Activity failed with err: %v", err)
 	}
 
 	logger.Info("Finished Edit Video Activity")
