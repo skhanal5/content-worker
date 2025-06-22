@@ -8,7 +8,7 @@ import (
 )
 
 type RetrieveClipsWorkflowInput struct {
-	Streamer string `json:"streamer,required"`
+	Streamer string `json:"streamer"`
 }
 
 func RetrieveClipsWorkflow(ctx workflow.Context, input RetrieveClipsWorkflowInput) (error) {
@@ -26,17 +26,14 @@ func RetrieveClipsWorkflow(ctx workflow.Context, input RetrieveClipsWorkflowInpu
 	}
 
 	var getClipSlugsOutput activity.GetClipSlugsOutput
-	err = workflow.ExecuteActivity(ctx, a.GetClipSlugs, activity.GetClipSlugsInput{
-		BroadcasterID: userOutput.BroadcasterID,
-	}).Get(ctx, &getClipSlugsOutput)
+	getClipSlugsInput := activity.GetClipSlugsInput(userOutput)
+	err = workflow.ExecuteActivity(ctx, a.GetClipSlugs, getClipSlugsInput).Get(ctx, &getClipSlugsOutput)
 	if err != nil {
 		return err
 	}
 
 	var getDownloadLinks activity.GetDownloadLinksOutput
-	err = workflow.ExecuteActivity(ctx, a.GetDownloadLinks, activity.GetDownloadLinksInput{
-		ClipIds: getClipSlugsOutput.ClipIds,
-	}).Get(ctx, &getDownloadLinks)
+	err = workflow.ExecuteActivity(ctx, a.GetDownloadLinks, activity.GetDownloadLinksInput(getClipSlugsOutput)).Get(ctx, &getDownloadLinks)
 	if err != nil {
 		return err
 	}
