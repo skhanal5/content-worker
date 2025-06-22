@@ -7,7 +7,7 @@ import (
 
 type TwitchManager interface {
 	GetUsers(broadcasterId string) (*UsersResponse, error)
-	GetClips(username string) (*ClipsResponse, error)
+	GetClips(username string, daysAgo int) (*ClipsResponse, error)
 	GetDownloadLink(clipSlug string) (string, error)
 }
 

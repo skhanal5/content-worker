@@ -29,26 +29,27 @@ func (a *Activity) GetTwitchUser(ctx context.Context, input GetTwitchUserInput) 
 
 type GetClipSlugsInput struct {
 	BroadcasterID string
+	DaysAgo       int
 }
 
 type GetClipSlugsOutput struct {
-	ClipIds []string 
+	ClipIds []string
 }
 
 func (a *Activity) GetClipSlugs(ctx context.Context, input GetClipSlugsInput) (*GetClipSlugsOutput, error) {
-	clips, err := a.GetClips(input.BroadcasterID)
+	clips, err := a.GetClips(input.BroadcasterID, input.DaysAgo)
 	if err != nil {
 		return nil, err
 	}
-	if clips == nil {	
+	if clips == nil {
 		return nil, fmt.Errorf("no clips found for broadcaster id: %s", input.BroadcasterID)
 	}
-	
+
 	clipsOutput := &GetClipSlugsOutput{
 		ClipIds: []string{},
 	}
 	for _, clip := range clips.Clips {
-		if clip.Duration < 15 || clip.ID == ""{
+		if clip.Duration < 15 || clip.ID == "" {
 			continue
 		}
 		clipsOutput.ClipIds = append(clipsOutput.ClipIds, clip.ID)
@@ -62,10 +63,10 @@ type GetDownloadLinksInput struct {
 }
 
 type GetDownloadLinksOutput struct {
-	DownloadLinks []string 
+	DownloadLinks []string
 }
 
-func (a *Activity) GetDownloadLinks(ctx context.Context,  input GetDownloadLinksInput) (*GetDownloadLinksOutput, error) {
+func (a *Activity) GetDownloadLinks(ctx context.Context, input GetDownloadLinksInput) (*GetDownloadLinksOutput, error) {
 	output := &GetDownloadLinksOutput{
 		DownloadLinks: []string{},
 	}

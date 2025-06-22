@@ -9,6 +9,7 @@ import (
 
 type RetrieveClipsWorkflowInput struct {
 	Streamer string `json:"streamer"`
+	DaysAgo int  `json:"days_ago"`
 }
 
 func RetrieveClipsWorkflow(ctx workflow.Context, input RetrieveClipsWorkflowInput) (error) {
@@ -26,7 +27,10 @@ func RetrieveClipsWorkflow(ctx workflow.Context, input RetrieveClipsWorkflowInpu
 	}
 
 	var getClipSlugsOutput activity.GetClipSlugsOutput
-	getClipSlugsInput := activity.GetClipSlugsInput(userOutput)
+	getClipSlugsInput := activity.GetClipSlugsInput{
+		BroadcasterID: userOutput.BroadcasterID,
+		DaysAgo: input.DaysAgo,
+	}
 	err = workflow.ExecuteActivity(ctx, a.GetClipSlugs, getClipSlugsInput).Get(ctx, &getClipSlugsOutput)
 	if err != nil {
 		return err

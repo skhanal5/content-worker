@@ -29,7 +29,7 @@ func (t *TwitchService) GetDownloadLink(clipSlug string) (string, error) {
 		Post("/gql")
 
     if err != nil {
-        return "", fmt.Errorf("Request failed: %v", err)
+        return "", fmt.Errorf("request failed: %v", err)
     }
 
 	clip := gqlResponses[0].Data.Clip
