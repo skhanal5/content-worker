@@ -4,7 +4,9 @@ import (
 	"clip-farmer-workflow/internal/service/edit"
 	"context"
 	"fmt"
+	"os"
 	"time"
+
 	"go.temporal.io/sdk/activity"
 )
 
@@ -31,14 +33,14 @@ var styleOptionRegistry = map[EditStyle][]edit.Option{
     },
     BlurredOverlayStretched: {
         edit.WithTemplate(edit.TemplateBlurred),
-        edit.WithForegroundSize(1080, 1080),
+        edit.WithForegroundSize(1080, 906),
     },
     BlackOverlay: {
         edit.WithTemplate(edit.TemplateBlack),
     },
     BlackOverlayStretched: {
 		edit.WithTemplate(edit.TemplateBlack),
-       	edit.WithForegroundSize(1080, 1080),
+       	edit.WithForegroundSize(1080, 906),
     },
     ImageOverlay: {
         edit.WithTemplate(edit.TemplateBlack),
@@ -80,4 +82,8 @@ func (a *Activity) EditVideo(ctx context.Context, input EditVideoInput) (error) 
 
 	logger.Info("Finished Edit Video Activity")
 	return nil
+}
+
+func (a *Activity) DeleteTmpVideo(ctx context.Context, inputPath string) (error) {
+    return os.Remove(inputPath)
 }

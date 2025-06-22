@@ -2,6 +2,7 @@ package edit
 
 import (
 	"fmt"
+	"math"
 	"strings"
 
 	ffmpeg_go "github.com/u2takey/ffmpeg-go"
@@ -30,15 +31,23 @@ func buildFFmpegCommand(inputPath, outputPath string, options *EditOptions) (*ff
 	}
 
     if options.Title != "" {
-        filterArgs := buildTitleArgs(options.Title)
+        filterArgs := buildTitleArgs(options.Title, options.ForegroundSize.Height)
         for _, args := range filterArgs {
             bgStream = bgStream.Filter("drawtext", args)
         }
     }
 
     fgStream := input.
-        Filter("scale", ffmpeg_go.Args{fmt.Sprintf("%d:%d", options.ForegroundSize.Width, options.ForegroundSize.Height)}).
+        Filter("scale", ffmpeg_go.Args{
+            fmt.Sprintf("%d:%d:force_original_aspect_ratio=increase", options.ForegroundSize.Width, options.ForegroundSize.Height),
+        }).
+        Filter("crop", ffmpeg_go.Args{
+            fmt.Sprintf("%d:%d:(in_w-out_w)/2:(in_h-out_h)/2",
+                options.ForegroundSize.Width,
+                options.ForegroundSize.Height),
+        }).
         Filter("format", ffmpeg_go.Args{"yuv420p"})
+
 
 
 	x := (CanvasSize.Width - options.ForegroundSize.Width) / 2
@@ -129,10 +138,14 @@ func splitTextIntoLines(text string, maxWidth int) []string {
     return lines
 }
 
-func buildTitleArgs(title string) []ffmpeg_go.Args {
-    const charactersPerLine = 20
-    const startY = 480
-    const lineHeight = 80
+func buildTitleArgs(title string, fgHeight int) []ffmpeg_go.Args {
+    charactersPerLine := 20
+    lineHeight := 80
+    textPadding := 60;
+    safeTextAreaHeight := 3 * lineHeight; 
+
+    rawY := float64((CanvasSize.Height - fgHeight)/2 - safeTextAreaHeight - textPadding)
+    startY := int(math.Max(0, rawY))
 
     lines := splitTextIntoLines(title, charactersPerLine)
     var argsList []ffmpeg_go.Args

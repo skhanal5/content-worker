@@ -2,4 +2,8 @@
 temporal workflow start \
     --task-queue default \
     --type RetrieveClipsWorkflow \
-    --input '{"Streamer":"adapt"}'
+    --input '{
+        "streamer":"jasontheween",
+        "days_ago":1,
+        "top_n":3
+    }'

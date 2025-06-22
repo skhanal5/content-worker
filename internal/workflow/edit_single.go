@@ -49,6 +49,12 @@ func EditSingleWorkflow(ctx workflow.Context, input EditSingleWorkflowInput) err
 	if err != nil {
 		return err
 	}
+
+	err = workflow.ExecuteActivity(ctx, a.DeleteTmpVideo, input.InputPath).Get(ctx, nil)
+	if err != nil {
+		return err
+	}
+	
 	log.Println("Completed Single Edit Workflow")
 	return nil
 }
