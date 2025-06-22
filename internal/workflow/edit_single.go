@@ -11,10 +11,10 @@ import (
 )
 
 type EditSingleWorkflowInput struct {
-	InputPath string `json:"input_path,required"`
-	OutputDirectory string `json:"output_directory,required"`
-	Strategy string `json:"strategy,required"`
-	Title string `json:"title,required"`
+	InputPath string `json:"input_path"`
+	OutputDirectory string `json:"output_directory"`
+	Strategy string `json:"strategy"`
+	Title string `json:"title"`
 }
 
 func EditSingleWorkflow(ctx workflow.Context, input EditSingleWorkflowInput) error {
@@ -41,7 +41,7 @@ func EditSingleWorkflow(ctx workflow.Context, input EditSingleWorkflowInput) err
 	editInput := activity.EditVideoInput{
 		InputPath: input.InputPath,
 		OutputPath:  outputPath,
-		Strategy: activity.VideoStrategyType(input.Strategy),
+		Style: activity.EditStyle(input.Strategy),
 		Title: input.Title,
 	}
 

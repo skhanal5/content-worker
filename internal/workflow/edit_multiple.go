@@ -11,14 +11,14 @@ import (
 )
 
 type Video struct {
-	InputPath string `json:"input_path,required"`
-	Title string `json:"title,required"`
-	Strategy string `json:"strategy,required"`
+	InputPath string `json:"input_path"`
+	Title string `json:"title"`
+	Strategy string `json:"strategy"`
 }
 
 type EditMultipleWorkflowInput struct {
-	OutputDirectory string `json:"output_directory,required"`
-	Videos []Video `json:"videos,required"`
+	OutputDirectory string `json:"output_directory"`
+	Videos []Video `json:"videos"`
 }
 
 
@@ -45,7 +45,7 @@ func EditMultipleWorkflow(ctx workflow.Context, input EditMultipleWorkflowInput)
 		editInput := activity.EditVideoInput{
 			InputPath: video.InputPath,
 			OutputPath:  outputPath,
-			Strategy: activity.VideoStrategyType(video.Strategy),
+			Style: activity.EditStyle(video.Strategy),
 			Title: video.Title,
 		}
 

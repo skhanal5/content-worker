@@ -8,40 +8,52 @@ import (
 	"go.temporal.io/sdk/activity"
 )
 
-type VideoStrategyType string
+type EditStyle string
 
 const (
-	BlurredOverlay VideoStrategyType = "blurred_overlay"
-	Resize         VideoStrategyType = "resize"
-	Watermark      VideoStrategyType = "watermark"
+	BlurredOverlay		 EditStyle = "blurred_overlay"
+	BlurredOverlayStretched EditStyle = "blurred_overlay_stretched"
+	BlackOverlay EditStyle = "black_overlay"
+	BlackOverlayStretched EditStyle = "black_overlay_stretched"
+	ImageOverlay EditStyle = "image_overlay"
 )
 
 type EditVideoInput struct {
 	InputPath string
 	OutputPath string
-	Strategy VideoStrategyType
+	Style EditStyle
 	Title string
 }
 
-
-func (a Activity) getStrategy(strategyType VideoStrategyType) (edit.EditingStrategy, error) {
-	switch strategyType {
-	case BlurredOverlay:
-		return &edit.BlurredOverlayStrategy{}, nil
-	default:
-		return nil, fmt.Errorf("unsupported strategy")
-	}
+var styleOptionRegistry = map[EditStyle][]edit.Option{
+    BlurredOverlay: {
+        edit.WithTemplate(edit.TemplateBlurred),
+    },
+    BlurredOverlayStretched: {
+        edit.WithTemplate(edit.TemplateBlurred),
+        edit.WithForegroundSize(1080, 1080),
+    },
+    BlackOverlay: {
+        edit.WithTemplate(edit.TemplateBlack),
+    },
+    BlackOverlayStretched: {
+		edit.WithTemplate(edit.TemplateBlack),
+       	edit.WithForegroundSize(1080, 1080),
+    },
+    ImageOverlay: {
+        edit.WithTemplate(edit.TemplateBlack),
+    },
 }
+
+
 
 func (a *Activity) EditVideo(ctx context.Context, input EditVideoInput) (error) {
 	logger := activity.GetLogger(ctx)		
 	logger.Info("Kicking off Edit Video Activity")
-
-	strategy,err := a.getStrategy(input.Strategy)	
-	if err != nil {
-		return err
-	}
-
+	config, ok := styleOptionRegistry[input.Style]
+	if !ok {
+        return fmt.Errorf("unknown style: %s", input.Style)
+    }
 	
 	stop := make(chan struct{})
     go func() {
@@ -58,11 +70,12 @@ func (a *Activity) EditVideo(ctx context.Context, input EditVideoInput) (error) 
         }
     }()
 	
-	err = a.EditManager.Render(input.InputPath, input.OutputPath, strategy, input.Title)
+    config = append(config, edit.WithTitle(input.Title))
+	err := edit.Render(input.InputPath, input.OutputPath, config...)
 	close(stop)
 
 	if err != nil {
-		return fmt.Errorf("Edit Video Activity failed with err: %v", err)
+		return fmt.Errorf("edit Video Activity failed with err: %v", err)
 	}
 
 	logger.Info("Finished Edit Video Activity")

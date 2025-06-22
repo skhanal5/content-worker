@@ -6,7 +6,7 @@ import (
 )
 
 type HelloWorldInput struct {
-	Name string `json:"name,required"`
+	Name string `json:"name"`
 }
 
 type HelloWorldOutput struct {

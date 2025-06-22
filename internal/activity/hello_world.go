@@ -1,9 +1,12 @@
 package activity
 
-import "context"
+import (
+	"clip-farmer-workflow/internal/service/helloworld"
+	"context"
+)
 
 func (a *Activity) HelloWorldActivity(ctx context.Context, name string) (string, error) {
-	result, err := a.SayHello(name)
+	result, err := helloworld.SayHello(name)
 	if err != nil {
 		return "", err
 	}
