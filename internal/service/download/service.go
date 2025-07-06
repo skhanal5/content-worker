@@ -7,7 +7,6 @@ import (
 	"github.com/go-resty/resty/v2"
 )
 
-
 type DownloadManager interface {
 	Download(url string, filepath string) error
 }
@@ -18,12 +17,12 @@ type DownloadService struct {
 
 func (d *DownloadService) Download(url string, filepath string) error {
 	if url == "" {
-        return fmt.Errorf("url cannot be empty")
-    }
-	
+		return fmt.Errorf("url cannot be empty")
+	}
+
 	resp, err := d.client.R().
-	SetOutput(filepath).
-	Get(url)
+		SetOutput(filepath).
+		Get(url)
 
 	if err != nil {
 		return err
@@ -37,6 +36,6 @@ func (d *DownloadService) Download(url string, filepath string) error {
 func NewDownloadService() *DownloadService {
 	return &DownloadService{
 		client: resty.New().
-		SetTimeout(30 * time.Second),
+			SetTimeout(30 * time.Second),
 	}
 }

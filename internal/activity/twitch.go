@@ -6,11 +6,10 @@ import (
 	"net/url"
 )
 
-
 type GetClipSlugsInput struct {
 	Broadcaster string
-	Limit int
-	Filter string
+	Limit       int
+	Filter      string
 }
 
 type GetClipSlugsOutput struct {
@@ -27,8 +26,7 @@ func (a *Activity) GetClipSlugs(ctx context.Context, input GetClipSlugsInput) (*
 		return nil, fmt.Errorf("no clips found for broadcaster id: %s", input.Broadcaster)
 	}
 
-
-	clipEdges := clips.Data.User.Clips.Edges	
+	clipEdges := clips.Data.User.Clips.Edges
 	slugs := []string{}
 
 	for _, clipEdge := range clipEdges {
@@ -67,7 +65,7 @@ func (a *Activity) GetDownloadLinks(ctx context.Context, input GetDownloadLinksI
 		clip := res.Data.Clip
 		qualities := clip.VideoQualities
 		bestQualityURL := qualities[0].SourceURL
-		
+
 		u, err := url.Parse(bestQualityURL)
 		if err != nil {
 			return nil, fmt.Errorf("failed to parse sourceURL: %v", err)

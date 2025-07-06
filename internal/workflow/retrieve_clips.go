@@ -9,11 +9,11 @@ import (
 
 type RetrieveClipsWorkflowInput struct {
 	Streamer string `json:"streamer"`
-	Limit int  `json:"limit"`
-	Filter string `json:"filter"`
+	Limit    int    `json:"limit"`
+	Filter   string `json:"filter"`
 }
 
-func RetrieveClipsWorkflow(ctx workflow.Context, input RetrieveClipsWorkflowInput) (error) {
+func RetrieveClipsWorkflow(ctx workflow.Context, input RetrieveClipsWorkflowInput) error {
 	ctx = workflow.WithActivityOptions(ctx, ActivityOptions)
 
 	var a activity.Activity
@@ -21,8 +21,8 @@ func RetrieveClipsWorkflow(ctx workflow.Context, input RetrieveClipsWorkflowInpu
 	var getClipSlugsOutput activity.GetClipSlugsOutput
 	getClipSlugsInput := activity.GetClipSlugsInput{
 		Broadcaster: input.Streamer,
-		Limit: input.Limit,
-		Filter: input.Filter,
+		Limit:       input.Limit,
+		Filter:      input.Filter,
 	}
 
 	err := workflow.ExecuteActivity(ctx, a.GetClipSlugs, getClipSlugsInput).Get(ctx, &getClipSlugsOutput)
@@ -36,12 +36,11 @@ func RetrieveClipsWorkflow(ctx workflow.Context, input RetrieveClipsWorkflowInpu
 		return err
 	}
 
-	
 	for _, url := range getDownloadLinks.DownloadLinks {
 		input := activity.DownloadClipInput{
 			Streamer: input.Streamer,
-			ClipID:  uuid.New().String(),
-			ClipURL: url,
+			ClipID:   uuid.New().String(),
+			ClipURL:  url,
 		}
 		err = workflow.ExecuteActivity(ctx, a.DownloadClip, input).Get(ctx, nil)
 		if err != nil {

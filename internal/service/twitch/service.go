@@ -16,15 +16,14 @@ const (
 	gqlUrl = "https://gql.twitch.tv"
 )
 
-
 type TwitchService struct {
-	gqlClient   *resty.Client
+	gqlClient *resty.Client
 }
 
 func NewTwitchService(gqlClientId string) *TwitchService {
 	return &TwitchService{
-		gqlClient:  resty.New().
-			SetTimeout(10 * time.Second).
+		gqlClient: resty.New().
+			SetTimeout(10*time.Second).
 			SetBaseURL(gqlUrl).
 			SetDebug(true).
 			SetHeader("Client-ID", gqlClientId),
@@ -48,22 +47,21 @@ func (t *TwitchService) GetClipInformation(clipSlug string) (*ClipMetadataRespon
 	}
 
 	var gqlResponses []ClipMetadataResponse // was type array
-	_, err :=t.gqlClient.R().
+	_, err := t.gqlClient.R().
 		SetHeader("Content-Type", "application/json").
 		SetBody(queryBody).
 		SetResult(&gqlResponses).
 		Post("/gql")
 
-    if err != nil {
-        return nil, fmt.Errorf("request failed: %v", err)
-    }
+	if err != nil {
+		return nil, fmt.Errorf("request failed: %v", err)
+	}
 	return &gqlResponses[0], nil
-
 
 	// clip := gqlResponses[0].Data.Clip
 	// qualities := clip.VideoQualities
 	// bestQualityURL := qualities[0].SourceURL
-	
+
 	// u, err := url.Parse(bestQualityURL)
 	// if err != nil {
 	// 	return "", fmt.Errorf("failed to parse sourceURL: %v", err)

@@ -15,7 +15,7 @@ func NewActivity(cfg config.Config) *Activity {
 	twitchManager := twitch.NewTwitchService(cfg.TwitchGQLClientId)
 	downloadManager := download.NewDownloadService()
 	return &Activity{
-		TwitchManager:     twitchManager,
-		DownloadManager:  downloadManager,
+		TwitchManager:   twitchManager,
+		DownloadManager: downloadManager,
 	}
 }
