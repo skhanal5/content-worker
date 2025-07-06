@@ -12,7 +12,7 @@ type Activity struct {
 }
 
 func NewActivity(cfg config.Config) *Activity {
-	twitchManager := twitch.NewTwitchService(cfg.TwitchHelixClientId, cfg.TwitchHelixSecret, cfg.TwitchGQLClientId)
+	twitchManager := twitch.NewTwitchService(cfg.TwitchGQLClientId)
 	downloadManager := download.NewDownloadService()
 	return &Activity{
 		TwitchManager:     twitchManager,
