@@ -17,8 +17,6 @@ You will need ffmpeg installed to use this. All workflows that involve editing f
 #### Environment Variables
 You will need the following environment variables defined to run the main workflow:
 ```bash
-export HELIX_CLIENT_ID="FOO"
-export HELIX_SECRET="BAR"
 export GQL_CLIENT_ID="BAZ"
 ```
 

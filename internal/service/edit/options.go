@@ -3,26 +3,24 @@ package edit
 type BackgroundType int
 
 const (
-    BlackScreen BackgroundType = iota
-    BlurredVideo
-    StaticImage
+	BlackScreen BackgroundType = iota
+	BlurredVideo
+	StaticImage
 )
 
 type Size struct {
-    Width  int
-    Height int
+	Width  int
+	Height int
 }
 
-
 type EditOptions struct {
-    Background     BackgroundType
-    BgImagePath    string
-    ForegroundSize Size
-    Title         string
+	Background     BackgroundType
+	BgImagePath    string
+	ForegroundSize Size
+	Title          string
 }
 
 type Option func(*EditOptions)
-
 
 func WithBackground(bg BackgroundType) Option {
 	return func(o *EditOptions) {
@@ -45,30 +43,29 @@ func WithForegroundSize(width, height int) Option {
 type TemplateType string
 
 const (
-    TemplateBlurred TemplateType = "blurred"
-    TemplateBlack   TemplateType = "black"
-    TemplateImage   TemplateType = "image"
+	TemplateBlurred TemplateType = "blurred"
+	TemplateBlack   TemplateType = "black"
+	TemplateImage   TemplateType = "image"
 )
 
-
 func WithTemplate(t TemplateType) Option {
-    return func(o *EditOptions) {
-        switch t {
-        case TemplateBlurred:
-            o.Background = BlurredVideo
-            o.ForegroundSize = Size{1080, 607}
-        case TemplateBlack:
-            o.Background = BlackScreen
-            o.ForegroundSize = Size{1080, 607}
-        case TemplateImage:
-            o.Background = StaticImage
-            o.ForegroundSize = Size{1080, 607}
-        }
-    }
+	return func(o *EditOptions) {
+		switch t {
+		case TemplateBlurred:
+			o.Background = BlurredVideo
+			o.ForegroundSize = Size{1080, 607}
+		case TemplateBlack:
+			o.Background = BlackScreen
+			o.ForegroundSize = Size{1080, 607}
+		case TemplateImage:
+			o.Background = StaticImage
+			o.ForegroundSize = Size{1080, 607}
+		}
+	}
 }
 
 func WithTitle(title string) Option {
-    return func(o *EditOptions) {
-        o.Title = title
-    }
+	return func(o *EditOptions) {
+		o.Title = title
+	}
 }

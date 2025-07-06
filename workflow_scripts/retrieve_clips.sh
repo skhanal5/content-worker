@@ -3,7 +3,7 @@ temporal workflow start \
     --task-queue default \
     --type RetrieveClipsWorkflow \
     --input '{
-        "streamer":"jasontheween",
-        "days_ago":1,
-        "top_n":3
+        "streamer":"adapt",
+        "limit":10,
+        "filter":"LAST_WEEK"
     }'

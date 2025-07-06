@@ -16,4 +16,3 @@ func Render(inputPath, outputPath string, opts ...Option) error {
 		ErrorToStdOut().
 		Run()
 }
-

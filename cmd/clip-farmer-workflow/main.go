@@ -7,9 +7,7 @@ import (
 
 func main() {
 	cfg := config.Config{
-		TwitchHelixClientId:     config.GetEnv("HELIX_CLIENT_ID", ""),
-		TwitchHelixSecret: config.GetEnv("HELIX_SECRET", ""),
-		TwitchGQLClientId: config.GetEnv("GQL_CLIENT_ID", ""),
+		TwitchGQLClientId: config.GetEnv("TWITCH_GQL_CLIENT_ID", ""),
 	}
 	worker.StartWorker(cfg)
 }

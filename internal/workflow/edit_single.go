@@ -11,24 +11,24 @@ import (
 )
 
 type EditSingleWorkflowInput struct {
-	InputPath string `json:"input_path"`
+	InputPath       string `json:"input_path"`
 	OutputDirectory string `json:"output_directory"`
-	Strategy string `json:"strategy"`
-	Title string `json:"title"`
+	Strategy        string `json:"strategy"`
+	Title           string `json:"title"`
 }
 
 func EditSingleWorkflow(ctx workflow.Context, input EditSingleWorkflowInput) error {
 
 	ao := workflow.ActivityOptions{
-		RetryPolicy: retryPolicy,
-        StartToCloseTimeout:    time.Second * 180,
-        HeartbeatTimeout:       time.Second * 15,
+		RetryPolicy:         retryPolicy,
+		StartToCloseTimeout: time.Second * 180,
+		HeartbeatTimeout:    time.Second * 15,
 	}
-	
+
 	ctx = workflow.WithActivityOptions(ctx, ao)
 	var a activity.Activity
 	log.Printf("Kicking off Single Edit Workflow with payload: %s", input)
-	
+
 	outputDir := input.OutputDirectory
 	err := os.MkdirAll(outputDir, os.ModePerm)
 	if err != nil {
@@ -37,12 +37,12 @@ func EditSingleWorkflow(ctx workflow.Context, input EditSingleWorkflowInput) err
 	}
 
 	outputPath := fmt.Sprintf("%s/%s.mp4", outputDir, input.Title)
-		
+
 	editInput := activity.EditVideoInput{
-		InputPath: input.InputPath,
-		OutputPath:  outputPath,
-		Style: activity.EditStyle(input.Strategy),
-		Title: input.Title,
+		InputPath:  input.InputPath,
+		OutputPath: outputPath,
+		Style:      activity.EditStyle(input.Strategy),
+		Title:      input.Title,
 	}
 
 	err = workflow.ExecuteActivity(ctx, a.EditVideo, editInput).Get(ctx, nil)
@@ -54,7 +54,7 @@ func EditSingleWorkflow(ctx workflow.Context, input EditSingleWorkflowInput) err
 	if err != nil {
 		return err
 	}
-	
+
 	log.Println("Completed Single Edit Workflow")
 	return nil
 }
