@@ -142,7 +142,7 @@ func buildTitleArgs(title string, fgHeight int) []ffmpeg_go.Args {
     charactersPerLine := 20
     lineHeight := 80
     textPadding := 60;
-    safeTextAreaHeight := 3 * lineHeight; 
+    safeTextAreaHeight := 2 * lineHeight; 
 
     rawY := float64((CanvasSize.Height - fgHeight)/2 - safeTextAreaHeight - textPadding)
     startY := int(math.Max(0, rawY))
