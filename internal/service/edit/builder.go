@@ -61,7 +61,7 @@ func buildFFmpegCommand(inputPath, outputPath string, options *EditOptions) (*ff
 
 	output := ffmpeg_go.Output([]*ffmpeg_go.Stream{video}, outputPath,
 		ffmpeg_go.KwArgs{
-			"map":      "0:a",
+			"map":      "1:a",
 			"c:a":      "copy",
 			"shortest": "",
 			"y":        "",
