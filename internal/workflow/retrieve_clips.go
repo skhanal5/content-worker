@@ -9,8 +9,8 @@ import (
 
 type RetrieveClipsWorkflowInput struct {
 	Streamer string `json:"streamer"`
-	DaysAgo int  `json:"days_ago"`
-	TopN int `json:"top_n"`
+	Limit int  `json:"limit"`
+	Filter string `json:"filter"`
 }
 
 func RetrieveClipsWorkflow(ctx workflow.Context, input RetrieveClipsWorkflowInput) (error) {
@@ -18,22 +18,14 @@ func RetrieveClipsWorkflow(ctx workflow.Context, input RetrieveClipsWorkflowInpu
 
 	var a activity.Activity
 
-	getTwitchUserInput := activity.GetTwitchUserInput{
-		Username: input.Streamer,
-	}
-	var userOutput activity.GetTwitchUserOutput
-	err := workflow.ExecuteActivity(ctx, a.GetTwitchUser, getTwitchUserInput).Get(ctx, &userOutput)
-	if err != nil {
-		return err
-	}
-
 	var getClipSlugsOutput activity.GetClipSlugsOutput
 	getClipSlugsInput := activity.GetClipSlugsInput{
-		BroadcasterID: userOutput.BroadcasterID,
-		DaysAgo: input.DaysAgo,
-		TopN: input.TopN,
+		Broadcaster: input.Streamer,
+		Limit: input.Limit,
+		Filter: input.Filter,
 	}
-	err = workflow.ExecuteActivity(ctx, a.GetClipSlugs, getClipSlugsInput).Get(ctx, &getClipSlugsOutput)
+
+	err := workflow.ExecuteActivity(ctx, a.GetClipSlugs, getClipSlugsInput).Get(ctx, &getClipSlugsOutput)
 	if err != nil {
 		return err
 	}
