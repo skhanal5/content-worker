@@ -1,38 +1,37 @@
 package activity
 
 import (
-	"clip-farmer-workflow/internal/service/twitch"
 	"context"
 	"fmt"
-	"sort"
+	"net/url"
 )
 
-type GetTwitchUserInput struct {
-	Username string
-}
+// type GetTwitchUserInput struct {
+// 	Username string
+// }
 
-type GetTwitchUserOutput struct {
-	BroadcasterID string
-}
+// type GetTwitchUserOutput struct {
+// 	BroadcasterID string
+// }
 
-func (a *Activity) GetTwitchUser(ctx context.Context, input GetTwitchUserInput) (*GetTwitchUserOutput, error) {
-	response, err := a.GetUsers(input.Username)
-	if err != nil {
-		return nil, err
-	}
-	if response == nil {
-		return nil, fmt.Errorf("no users found for username: %s", input.Username)
-	}
-	id := response.Users[0].Id
-	return &GetTwitchUserOutput{
-		BroadcasterID: id,
-	}, nil
-}
+// func (a *Activity) GetTwitchUser(ctx context.Context, input GetTwitchUserInput) (*GetTwitchUserOutput, error) {
+// 	response, err := a.GetUsers(input.Username)
+// 	if err != nil {
+// 		return nil, err
+// 	}
+// 	if response == nil {
+// 		return nil, fmt.Errorf("no users found for username: %s", input.Username)
+// 	}
+// 	id := response.Users[0].Id
+// 	return &GetTwitchUserOutput{
+// 		BroadcasterID: id,
+// 	}, nil
+// }
 
 type GetClipSlugsInput struct {
-	BroadcasterID string
-	DaysAgo       int
-	TopN int
+	Broadcaster string
+	Limit int
+	Filter string
 }
 
 type GetClipSlugsOutput struct {
@@ -40,39 +39,27 @@ type GetClipSlugsOutput struct {
 }
 
 func (a *Activity) GetClipSlugs(ctx context.Context, input GetClipSlugsInput) (*GetClipSlugsOutput, error) {
-	topN := input.TopN
-	
-	clips, err := a.GetClips(input.BroadcasterID, input.DaysAgo)
+
+	clips, err := a.GetUserClips(input.Broadcaster, input.Limit, input.Filter)
 	if err != nil {
 		return nil, err
 	}
 	if clips == nil {
-		return nil, fmt.Errorf("no clips found for broadcaster id: %s", input.BroadcasterID)
+		return nil, fmt.Errorf("no clips found for broadcaster id: %s", input.Broadcaster)
 	}
 
-	filteredClips := []twitch.Clip{} 
-	for _, clip := range clips.Clips {
-		if clip.Duration >= 15 && clip.ID != "" {
-			filteredClips = append(filteredClips, clip)
-		}
+
+	clipEdges := clips.Data.User.Clips.Edges	
+	slugs := []string{}
+
+	for _, clipEdge := range clipEdges {
+		clipNode := clipEdge.Node
+		slugs = append(slugs, clipNode.Slug)
 	}
 
-	sort.Slice(filteredClips, func(i, j int) bool {
-		return filteredClips[i].ViewCount > filteredClips[j].ViewCount
-	})
-
-	if input.TopN > len(filteredClips) {
-		topN = len(filteredClips)
-	}
-	topClips := filteredClips[:topN]
-
-	clipsOutput := &GetClipSlugsOutput{
-		ClipIds: make([]string, 0, topN),
-	}
-	for _, clip := range topClips {
-		clipsOutput.ClipIds = append(clipsOutput.ClipIds, clip.ID)
-	}
-	return clipsOutput, nil
+	return &GetClipSlugsOutput{
+		ClipIds: slugs,
+	}, nil
 
 }
 
@@ -88,12 +75,31 @@ func (a *Activity) GetDownloadLinks(ctx context.Context, input GetDownloadLinksI
 	output := &GetDownloadLinksOutput{
 		DownloadLinks: []string{},
 	}
+	// TODO: Consider if this should be multiple activity calls instead of 1 call
 	for _, clipId := range input.ClipIds {
-		res, err := a.GetDownloadLink(clipId)
+		res, err := a.GetClipInformation(clipId)
 		if err != nil {
 			return nil, err
 		}
-		output.DownloadLinks = append(output.DownloadLinks, res)
+		if res == nil {
+			return nil, fmt.Errorf("no clip found for id: %s", clipId)
+		}
+
+		clip := res.Data.Clip
+		qualities := clip.VideoQualities
+		bestQualityURL := qualities[0].SourceURL
+		
+		u, err := url.Parse(bestQualityURL)
+		if err != nil {
+			return nil, fmt.Errorf("failed to parse sourceURL: %v", err)
+		}
+
+		q := u.Query()
+		q.Set("sig", clip.PlaybackAccessToken.Signature)
+		q.Set("token", clip.PlaybackAccessToken.Value)
+		u.RawQuery = q.Encode()
+
+		output.DownloadLinks = append(output.DownloadLinks, u.String())
 	}
 	return output, nil
 }
