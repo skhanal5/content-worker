@@ -1,61 +1,19 @@
 package twitch
 
-type Clip struct {
-	ID              string `json:"id,omitempty"`
-	URL             string `json:"url,omitempty"`
-	EmbedURL        string `json:"embed_url,omitempty"`
-	BroadcasterID   string `json:"broadcaster_id,omitempty"`
-	BroadcasterName string `json:"broadcaster_name,omitempty"`
-	CreatorID       string `json:"creator_id,omitempty"`
-	CreatorName     string `json:"creator_name,omitempty"`
-	VideoID         string `json:"video_id,omitempty"`
-	GameID          string `json:"game_id,omitempty"`
-	Language        string `json:"language,omitempty"`
-	Title           string `json:"title,omitempty"`
-	ViewCount       int    `json:"view_count,omitempty"`
-	CreatedAt       string `json:"created_at,omitempty"`
-	ThumbnailURL    string `json:"thumbnail_url,omitempty"`
-	Duration        float32    `json:"duration,omitempty"`
-	VodOffset       int    `json:"vod_offset,omitempty"`
-	IsFeatured      bool   `json:"is_featured,omitempty"`
-}
-
-type Pagination struct {
-	Cursor string `json:"cursor,omitempty"`
-}
-
-type ClipsResponse struct {
-	Clips      []Clip     `json:"data,omitempty"`
-	Pagination Pagination `json:"pagination,omitempty"`
-}
-
-type User struct {
-	Id               string   `json:"id,omitempty"`
-	Login            string   `json:"login,omitempty"`
-	DisplayNmame             string   `json:"display_name,omitempty"`
-	Type         string   `json:"broadcaster_language,omitempty"`
-	BroadcasterType string   `json:"broadcaster_type,omitempty"`
-	Description       string   `json:"description,omitempty"`
-	ProfileImageURL   string   `json:"profile_image_url,omitempty"`
-	OfflineImageURL    string   `json:"offline_image_url,omitempty"`
-	ViewCount		  int      `json:"view_count,omitempty"`
-	CreatedAt		 string   `json:"created_at,omitempty"`
-}
-
-type UsersResponse struct {
-	Users      []User     `json:"data,omitempty"`
-	Pagination Pagination `json:"pagination,omitempty"`
-}
-
-type AuthResponse struct {
-	AccessToken string `json:"access_token,omitempty"`
-	ExpiresIn   int    `json:"expires_in,omitempty"`
-	TokenType   string `json:"token_type,omitempty"`
-}
-
-
-type GraphQLResponse struct {
+type ClipMetadataResponse struct {
 	Data ClipData `json:"data"`
+	Extensions Extensions `json:"extensions"`
+	Errors []Error `json:"errors,omitempty"`
+}
+
+type Error struct {
+	Message string `json:"message"`
+}
+
+type Extensions struct {
+	DurationMilliseconds int `json:"durationMilliseconds"`
+	OperationName string `json:"operationName"`
+	RequestID string `json:"requestID"`
 }
 
 type ClipData struct {
@@ -77,4 +35,84 @@ type VideoQuality struct {
 	Quality   string  `json:"quality"`
 	FrameRate float64 `json:"frameRate"`
 	SourceURL string  `json:"sourceURL"`
+}
+
+type UserClipsResponse struct {
+	Data UserClipsData `json:"data"`
+	Extensions Extensions `json:"pagination"`
+	Errors []Error `json:"errors,omitempty"`
+}
+
+
+type UserClipsData struct {
+	User UserClipsInfo `json:"user"`
+}
+
+type UserClipsInfo struct {
+	ID    string `json:"id"`
+	Clips UserClips `json:"clips"`
+	TypeName string `json:"__typename"`
+}
+
+type UserClips struct {
+	PageInfo PageInfo `json:"pageInfo"`
+	Edges []UserClipEdge `json:"edges"`
+}
+
+type PageInfo struct {
+	HasNextPage bool   `json:"hasNextPage"`
+}
+
+type UserClipEdge struct {
+	Cursor string `json:"cursor"`
+	Node UserClipNode `json:"node"`
+	TypeName string `json:"__typename"`
+}
+
+type UserClipNode struct {
+	ID          string `json:"id"`
+	Slug 	  string `json:"slug"`
+	Url 	   string `json:"url"`
+	EmbedURL string `json:"embedURL"`
+	Title       string `json:"title"`
+	ViewCount   int    `json:"viewCount"`
+	Language    string `json:"language"`
+	Curator ClipCurator `json:"curator"`
+	Game ClipGame `json:"game"`
+	Broadcaster ClipBroadcaster `json:"broadcaster"`
+	ThumbnailURL string `json:"thumbnailURL"`
+	CreatedAt   string `json:"createdAt"`
+	DurationSeconds int `json:"durationSeconds"`
+	ChampBadge string `json:"champBadge"`
+	IsFeatured bool `json:"isFeatured"`
+	GuestStarParticipants map[string]interface{} `json:"guestStarParticipants"`
+	TypeName string `json:"__typename"`
+}
+
+type ClipCurator struct {
+	ID        string `json:"id"`
+	Login     string `json:"login"`
+	DisplayName string `json:"displayName"`
+	TypeName string `json:"__typename"`
+}
+
+type ClipGame struct {
+	ID        string `json:"id"`
+	Slug 	string `json:"slug"`
+	Name      string `json:"name"`
+	BoxArtURL string `json:"boxArtURL"`
+	TypeName string `json:"__typename"`
+}
+
+type ClipBroadcaster struct {
+	ID        string `json:"id"`
+	Login     string `json:"login"`
+	DisplayName string `json:"displayName"`
+	ProfileImageURL string `json:"profileImageURL"`
+	PrimaryColorHex string `json:"primaryColorHex"`
+	Roles struct {
+		IsPartner bool `json:"isPartner"`
+		TypeName string `json:"__typename"`
+	}
+	TypeName string `json:"__typename"`
 }

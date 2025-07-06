@@ -2,10 +2,9 @@ package twitch
 
 import (
 	"fmt"
-	"net/url"
 )
 
-func (t *TwitchService) GetDownloadLink(clipSlug string) (string, error) {
+func (t *TwitchService) GetClipInformation(clipSlug string) (*ClipMetadataResponse, error) {
 	queryBody := []map[string]interface{}{
 		{
 			"operationName": "VideoAccessToken_Clip",
@@ -21,7 +20,7 @@ func (t *TwitchService) GetDownloadLink(clipSlug string) (string, error) {
 		},
 	}
 
-	var gqlResponses []GraphQLResponse
+	var gqlResponses []ClipMetadataResponse // was type array
 	_, err :=t.gqlClient.R().
 		SetHeader("Content-Type", "application/json").
 		SetBody(queryBody).
@@ -29,23 +28,62 @@ func (t *TwitchService) GetDownloadLink(clipSlug string) (string, error) {
 		Post("/gql")
 
     if err != nil {
-        return "", fmt.Errorf("request failed: %v", err)
+        return nil, fmt.Errorf("request failed: %v", err)
     }
+	return &gqlResponses[0], nil
 
-	clip := gqlResponses[0].Data.Clip
-	qualities := clip.VideoQualities
-	bestQualityURL := qualities[0].SourceURL
+
+	// clip := gqlResponses[0].Data.Clip
+	// qualities := clip.VideoQualities
+	// bestQualityURL := qualities[0].SourceURL
 	
-	u, err := url.Parse(bestQualityURL)
-	if err != nil {
-		return "", fmt.Errorf("failed to parse sourceURL: %v", err)
-	}
+	// u, err := url.Parse(bestQualityURL)
+	// if err != nil {
+	// 	return "", fmt.Errorf("failed to parse sourceURL: %v", err)
+	// }
 
-	q := u.Query()
-	q.Set("sig", clip.PlaybackAccessToken.Signature)
-	q.Set("token", clip.PlaybackAccessToken.Value)
-	u.RawQuery = q.Encode()
+	// q := u.Query()
+	// q.Set("sig", clip.PlaybackAccessToken.Signature)
+	// q.Set("token", clip.PlaybackAccessToken.Value)
+	// u.RawQuery = q.Encode()
 
-	return u.String(), nil
+	// return u.String(), nil
 }
 
+func (t *TwitchService) GetUserClips(streamer string, limit int, filter string) (*UserClipsResponse, error) {
+	queryBody := []map[string]interface{}{
+		{
+			"operationName": "ClipsCards__User",
+			"variables": map[string]interface{}{
+				"login": streamer,
+				"limit": limit,
+				"criteria": map[string]interface{}{
+					"filter": filter,
+				},
+			},
+			"extensions": map[string]interface{}{
+				"persistedQuery": map[string]interface{}{
+					"version":    1,
+					"sha256Hash": "4eb8f85fc41a36c481d809e8e99b2a32127fdb7647c336d27743ec4a88c4ea44",
+				},
+			},
+		},
+	}
+
+	var response []UserClipsResponse
+	_, err := t.gqlClient.R().
+		SetHeader("Content-Type", "application/json").
+		SetBody(queryBody).
+		SetResult(&response).
+		Post("/gql")
+
+	if err != nil {
+		return nil, fmt.Errorf("request failed: %v", err)
+	}
+
+	if len(response[0].Errors) > 0 {
+		return nil, fmt.Errorf("error from Twitch API: %s", response[0].Errors[0].Message)
+	}
+
+	return &response[0], nil
+}
